@@ -18,6 +18,7 @@ NORMAL_FONT = "Arial"
 #SIZES
 W_HEIGHT = 750
 W_WIDTH = 700
+# MESSAGES
 WELCOME = """Thanks for using Qwiki"""
 # GLOBAL VARS
 TARGET = None

@@ -12,6 +12,15 @@ def name_check(name):
         return False
     return True
 
+def format_tag_info() -> str:
+    """Formats current loaded wiki's tag information"""
+    pass
+
+def format_db_info() -> str:
+    """Formats s.WIKI_DB_INFO"""
+    pass
+
+# name change to WikiSettings?
 class ChangeWikiPage(tk.Frame):
     def __init__(self, parent, status):
         tk.Frame.__init__(self, parent)
@@ -100,9 +109,18 @@ class ChangeWikiPage(tk.Frame):
     def display(self):
         self.info = tk.Label(self.right, bg=s.BG2, fg=s.SEARCHBG)
         place(self.info, h=1, w=1, x=0, y=0)
-        self.errors = tk.Label(self.left, text="", anchor="w", bg=s.FG,
+        # move to top of info display
+        self.errors = tk.Label(self.right, text="", anchor="w", bg="white",
                                fg=s.TEXT1, font=(s.NORMAL_FONT, 12, "bold"))
         place(self.errors, h=0.08, w=1, x=0, y=0.4)
+
+    def tagging_system(self):
+        self.add_tag_label = tk.Label(self.left, text="Tag Name:")
+        #place(self.add_tag_label)
+        self.add_tag_entry = tk.Entry(self.left)
+        #place(self.add_tag_entry)
+        self.add_tag_button = tk.Button(self.left, text="Add")
+        #place(self.add_tag_button)
 
     def layout(self):
         """All partitions are relative to self.content"""
