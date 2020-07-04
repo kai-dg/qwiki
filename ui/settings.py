@@ -15,3 +15,5 @@ NORMAL_FONT = "Arial"
 #SIZES
 W_HEIGHT = 700
 W_WIDTH = 700
+WELCOME = """Thanks for using Qwiki
+"""
