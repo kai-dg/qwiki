@@ -25,6 +25,7 @@ IDX = 0
 PAGE_NAME = ""
 CONTENT = {} # idx: {header: content}
 WIKI_LIST = ["test1"]
+WIKI_DB_INFO = {}
 # FILES
 JSON_NAME = "db_info.json"
 DEFAULT_DB = "CHANGE WIKI"

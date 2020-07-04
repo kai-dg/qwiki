@@ -13,8 +13,9 @@ def name_check(name):
     return True
 
 class ChangeWikiPage(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, status):
         tk.Frame.__init__(self, parent)
+        self.status = status
         self.content = tk.Frame(parent, bg=s.FG, padx=18, pady=18)
         place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.layout()
@@ -26,17 +27,27 @@ class ChangeWikiPage(tk.Frame):
 
     def add_wiki(self, name, notes):
         if name_check(name):
-            res = f"{name.capitalize()}.db"
+            res = name.capitalize()
             db.create_profile(res, notes)
+            s.WIKI_DB_INFO = db.read_json()
             self.errors["text"] = f"Added new wiki: {res}"
             s.WIKI_LIST.append(res)
             self.swap["values"] = s.WIKI_LIST
             self.swap.set(res)
+            self.status["text"] = res
+            db.load_profile(res)
         else:
             self.errors["text"] = "Please enter a 1 word name only."
 
+    def delete_wiki(self, name):
+        res = f"{name}"
+        if s.WIKI_DB_INFO["wikis"].get(res, "") != "":
+            db.delete_profile(res)
+        else:
+            self.errors["text"] = f"Could not find the wiki: {name}."
+
     def labels(self):
-        swap_name = tk.Label(self.left, text="Loaded:", bg=s.FG,
+        swap_name = tk.Label(self.left, text="Load:", bg=s.FG,
                              fg=s.TEXT1, font=(s.FONT1, 9))
         place(swap_name, h=0.05, w=0.2, x=0, y=0)
         wiki_name = tk.Label(self.left, text="Wiki Name:", bg=s.FG,

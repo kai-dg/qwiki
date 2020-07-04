@@ -7,8 +7,8 @@ import sys
 #DB_INFO_PATH = os.path.join(ABSPATH, s.JSON_NAME)
 if not os.path.isfile(s.JSON_NAME):
     with open(s.JSON_NAME, "w") as f:
-        f.write("{}")
-
+        template = {"active": "", "wikis": {}}
+        json.dump(template, f)
 
 def read_json() -> dict:
 	with open(s.JSON_NAME, "r") as f:
@@ -21,18 +21,23 @@ def write_json(data):
 
 def create_profile(name, notes):
 	data = read_json()
-	data[name] = notes
+	data["wikis"][name] = notes
+	write_json(data)
+
+def load_profile(name):
+	data = read_json()
+	data["active"] = name
 	write_json(data)
 
 def delete_profile(name):
-	del data[name]
+	del data["wikis"][name]
 
 def update_profile(name, new, notes):
 	data = read_json()
 	if new:
-		temp = data[name]
-		data[new] = temp
-		del data[name]
+		temp = data["wikis"][name]
+		data["wikis"][new] = temp
+		del data["wikis"][name]
 	if notes:
-		data[name] = notes
+		data["wikis"][name] = notes
 	write_json(data)

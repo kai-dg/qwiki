@@ -6,7 +6,9 @@ from ui.page_wiki import WikiPage
 from ui.page_change_wiki import ChangeWikiPage
 from ui.page_add import AddPage
 from ui.page_update import UpdatePage
-s.WIKI_LIST = list(db.read_json())
+s.WIKI_DB_INFO = db.read_json()
+s.DEFAULT_DB = s.WIKI_DB_INFO["active"] if s.WIKI_DB_INFO["active"] != "" else s.DEFAULT_DB
+s.WIKI_LIST = list(s.WIKI_DB_INFO["wikis"])
 s.WIKI_LIST = [""] if s.WIKI_LIST == [] else s.WIKI_LIST
 
 
@@ -29,15 +31,16 @@ class App():
     def content(self):
         self.content = tk.Frame(self.frame, bg=s.FG)
         self.content.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04, anchor="n")
-        lab = tk.Label(self.content, text=s.WELCOME, bg=s.FG, fg=s.SEARCHFG)
+        lab = tk.Label(self.content, text=s.WELCOME, font=(s.FONT1, 12, "bold"),
+                       bg=s.FG, fg=s.SEARCHFG)
         lab.place(relheight=1, relwidth=1, relx=0, rely=0)
 
     def search_bar(self):
         frame_search = tk.Frame(self.frame, bg=s.SEARCHBG)
         frame_search.place(relx=0.1, rely=0, relheight=0.04, relwidth=2, anchor="n")
-        searchlabel = tk.Label(frame_search, text=s.DEFAULT_DB, bg=s.SEARCHBG)
-        searchlabel.config(font=(s.FONT1, 9))
-        searchlabel.place(relx=0.45, rely=0, relwidth=0.08, relheight=1)
+        self.searchlabel = tk.Label(frame_search, text=s.DEFAULT_DB, bg=s.SEARCHBG)
+        self.searchlabel.config(font=(s.FONT1, 9, "bold"))
+        self.searchlabel.place(relx=0.45, rely=0, relwidth=0.08, relheight=1)
         self.searchbar = tk.Entry(frame_search, font=(s.NORMAL_FONT, 12), bg=s.SEARCHFG)
         self.searchbar.place(relx=0.53, rely=0, relwidth=0.34, relheight=1)
         searchbutton = tk.Button(frame_search, text="SEARCH", font=(s.NORMAL_FONT, 9),
@@ -63,7 +66,8 @@ class App():
         delete_wiki.place(relx=0.5, relwidth=0.25, relheight=1)
         change_wiki = tk.Button(frame_editor, text="Change Wiki", font=(s.FONT1, 9),
                                     bg=s.SEARCHBG, fg=s.TEXT3,
-                                    command=lambda: self.replace(ChangeWikiPage(self.frame)))
+                                    command=lambda: self.replace(ChangeWikiPage(self.frame,
+                                    self.searchlabel)))
         change_wiki.place(relx=0.75, relwidth=0.25, relheight=1)
 
 if __name__ == "__main__":
