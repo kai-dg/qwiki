@@ -1,5 +1,11 @@
 # Qwiki
-Quick custom wiki, text-only, terminal tool
+Quick custom wikis
+
+## Setup
+Windows: File is in `dist/` folder, run that
+Mac/Linux: You need to compile it yourself with PyInstaller
+    - Run `python -m PyInstaller qwiki_app.py --onefile --noconsole`
+    - Or run `python -m pyinstaller qwiki_app.py --onefile --noconsole`
 
 ## TODOs
 Strict Tag System:

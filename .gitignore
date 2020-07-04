@@ -6,3 +6,4 @@ venv/*
 notes
 build/*
 qwiki_app.spec
+utils/db_info.json
