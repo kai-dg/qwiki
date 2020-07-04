@@ -14,29 +14,17 @@ class Card(BaseModel):
     """Every card creation comes with 1 subcard"""
     name = CharField(max_length=50)
     notes = TextField()
-    card_format = CharField(max_length=50)
-    images = BooleanField(default=False)
-
+    image_path = CharField(max_length=50)
+    image_title = CharField(max_length=50)
+    
 class Content(BaseModel):
     """Card content"""
     card = ForeignKeyField(Card)
     title = CharField(max_length=50)
+    order = IntegerField()
     content = TextField()
-    subcontent = BooleanField(default=False)
-
-class Subcontent(BaseModel):
-    """Card content's content"""
-    card = ForeignKeyField(Content)
-    title = CharField(max_length=50)
-    content = TextField()
-
-class Image(BaseModel):
-    """Future implementation"""
-    card = ForeignKeyField(Card, null=True)
-    content = ForeignKeyField(Content, null=True)
-    subcontent = ForeignKeyField(Subcontent, null=True)
-    path = CharField(max_length=150)
-    title = CharField(max_length=50)
+    content_image = CharField(max_length=50)
+    content_image_title = CharField(max_length=50)
 
 if __name__ == "__main__":
     pass
