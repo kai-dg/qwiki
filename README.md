@@ -1,8 +1,8 @@
 # Qwiki
-Quick custom wikis
+Quick custom wikis. A clean way to organize information quickly.
 
 ## Setup
-Windows: File is in `dist/` folder, run that
+Windows: Run `dist/qwiki_app.exe`
 Mac/Linux: You need to compile it yourself with PyInstaller
     - Run `python -m PyInstaller qwiki_app.py --onefile --noconsole`
     - Or run `python -m pyinstaller qwiki_app.py --onefile --noconsole`

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+from peewee import *
+from utils.models import Page
+from utils.models import Content
+from utils.models import Tag
 import ui.settings as s
 import os
 import json

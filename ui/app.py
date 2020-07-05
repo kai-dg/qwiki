@@ -9,6 +9,7 @@ from ui.page_update import UpdatePage
 from ui.page_confirms import DelConfirmPage
 s.WIKI_DB_INFO = db.read_json()
 s.DEFAULT_DB = s.WIKI_DB_INFO["active"] if s.WIKI_DB_INFO["active"] != "" else s.DEFAULT_DB
+s.DB_FILE = f"{s.DEFAULT_DB}.db"
 s.WIKI_LIST = list(s.WIKI_DB_INFO["wikis"])
 s.WIKI_LIST = [""] if s.WIKI_LIST == [] else s.WIKI_LIST
 

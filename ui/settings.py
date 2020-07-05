@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from peewee import *
 # APP STUFF
 TITLE = "Qwiki"
 #COLORS
@@ -30,3 +31,5 @@ WIKI_DB_INFO = {}
 # FILES
 JSON_NAME = "db_info.json"
 DEFAULT_DB = "CHANGE WIKI"
+DB_FILE = ".data"
+DB = SqliteDatabase(DB_FILE)

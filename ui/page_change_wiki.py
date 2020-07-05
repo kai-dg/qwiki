@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Add page button frame"""
+from peewee import *
 import tkinter as tk
 from tkinter import ttk
 from ui.tk_helper import place
 import ui.settings as s
 import utils.database as db
-
+from utils.models import make_tables
+from utils.models import models_db_swap
 
 def name_check(name):
     if len(name.split()) != 1:
@@ -45,8 +47,17 @@ class ChangeWikiPage(tk.Frame):
             self.swap.set(res)
             self.status["text"] = res
             db.load_profile(res)
+            s.DB_FILE = f"{res}.db"
+            # Changing DB, making its tables
+            s.DB.close()
+            s.DB = SqliteDatabase(s.DB_FILE)
+            s.DB.connect()
+            models_db_swap()
+            make_tables()
         else:
             self.errors["text"] = "Please enter a 1 word name only."
+        self.name_entry.delete(0, "end")
+        self.notes_entry.delete(0, "end")
 
     def delete_wiki(self, name):
         res = f"{name}"
@@ -71,19 +82,25 @@ class ChangeWikiPage(tk.Frame):
         import_label = tk.Label(self.left, text="Import:", bg=s.FG,
                                 fg=s.TEXT1, font=(s.FONT1, 9))
         place(import_label, h=0.05, w=0.2, x=0, y=0.35)
+        self.add_tag_label = tk.Label(self.left, text="Tag Name:", bg=s.FG,
+                                      fg=s.TEXT1, font=(s.FONT1, 9))
+        place(self.add_tag_label, h=0.05, w=0.2, x=0, y=0.45)
 
     def entries(self):
         self.swap = ttk.Combobox(self.left, value=s.WIKI_LIST)
+        self.swap["state"] = "readonly"
         self.swap.current(0)
         place(self.swap, h="", w=0.3, x=0.25, y=0.01)
         self.name_entry = tk.Entry(self.left, bg=s.SEARCHFG)
         place(self.name_entry, h="", w=0.3, x=0.25, y=0.11)
         self.notes_entry = tk.Entry(self.left, bg=s.SEARCHFG)
         place(self.notes_entry, h="", w=0.3, x=0.25, y=0.16)
-        self.change_entry = tk.Entry(self.left) # dropdown
+        self.change_entry = tk.Entry(self.left, bg=s.SEARCHFG) # dropdown
         place(self.change_entry, h="", w=0.3, x=0.25, y=0.26)
-        self.import_entry = tk.Entry(self.left)
+        self.import_entry = tk.Entry(self.left, bg=s.SEARCHFG)
         place(self.import_entry, h="", w=0.3, x=0.25, y=0.36)
+        self.add_tag_entry = tk.Entry(self.left, bg=s.SEARCHFG)
+        place(self.add_tag_entry, h="", w=0.3, x=0.25, y=0.46)
         
     def buttons(self):
         swap_button = tk.Button(self.left, text="Change", bg=s.SEARCHBG,
@@ -105,22 +122,16 @@ class ChangeWikiPage(tk.Frame):
         import_button = tk.Button(self.left, text="Import", bg=s.SEARCHBG,
                                   fg=s.TEXT3)
         place(import_button, h="", w=0.3, x=0.59, y=0.355)
+        self.add_tag_button = tk.Button(self.left, text="Add", bg=s.SEARCHBG,
+                                        fg=s.TEXT3)
+        place(self.add_tag_button, h="", w=0.3, x=0.59, y=0.455)
 
     def display(self):
         self.info = tk.Label(self.right, bg=s.BG2, fg=s.SEARCHBG)
-        place(self.info, h=1, w=1, x=0, y=0)
-        # move to top of info display
-        self.errors = tk.Label(self.right, text="", anchor="w", bg="white",
-                               fg=s.TEXT1, font=(s.NORMAL_FONT, 12, "bold"))
-        place(self.errors, h=0.08, w=1, x=0, y=0.4)
-
-    def tagging_system(self):
-        self.add_tag_label = tk.Label(self.left, text="Tag Name:")
-        #place(self.add_tag_label)
-        self.add_tag_entry = tk.Entry(self.left)
-        #place(self.add_tag_entry)
-        self.add_tag_button = tk.Button(self.left, text="Add")
-        #place(self.add_tag_button)
+        place(self.info, h=0.92, w=1, x=0, y=0.08)
+        self.errors = tk.Label(self.right, text="", anchor="w", bg=s.BG2,
+                               fg=s.TEXT1, font=(s.NORMAL_FONT, 12, "bold"), padx=10)
+        place(self.errors, h=0.08, w=1, x=0, y=0)
 
     def layout(self):
         """All partitions are relative to self.content"""
