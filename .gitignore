@@ -1,5 +1,5 @@
 */__pycache__/*
-test.db
+Test.db
 venv/*
 *.pyc
 *.swp
@@ -8,3 +8,4 @@ build/*
 qwiki_app.spec
 utils/db_info.json
 db_info.json
+.data

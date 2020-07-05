@@ -2,7 +2,8 @@
 import tkinter as tk
 from ui.tk_helper import place
 import ui.settings as s
-
+from tkinter.filedialog import askopenfilename
+import os
 
 class DelConfirmPage(tk.Frame):
     def __init__(self, parent):
@@ -16,13 +17,14 @@ class DelConfirmPage(tk.Frame):
         self.buttons()
 
     def delete_target(self):
-        pass
+        filename = askopenfilename()
+        print(os.path.basename(filename))
 
     def back(self):
         self.content.destroy()
 
     def buttons(self):
-        self.yes = tk.Button(self.content, text="Yes")
+        self.yes = tk.Button(self.content, text="Yes", command=lambda: self.delete_target())
         self.yes.pack()
         self.no = tk.Button(self.content, text="No", command=lambda: self.back())
         self.no.pack()

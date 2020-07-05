@@ -10,6 +10,7 @@ SEARCHBG = "#9C9984"
 SEARCHFG = "#F7F5E4"
 BUTTON_A = "#6ABAD7"
 BUTTON_D = "#458EA9"
+BUTTON_R = "#9A6767"
 TEXT1 = "#FAF9EF" # light
 TEXT2 = "#333332" # dark
 TEXT3 = "#1D1D1C" # darker
@@ -21,6 +22,9 @@ W_HEIGHT = 750
 W_WIDTH = 700
 # MESSAGES
 WELCOME = """Thanks for using Qwiki"""
+START_HELP = "Get Started Here:\nADD a Wiki"
+SEARCH_HELP = "Searchbar Here"
+NAME_HELP = "Current Wiki"
 # GLOBAL VARS
 TARGET = None
 IDX = 0
@@ -28,6 +32,17 @@ PAGE_NAME = ""
 CONTENT = {} # idx: {header: content}
 WIKI_LIST = ["test1"]
 WIKI_DB_INFO = {}
+# cont format: {idx: {title: content}}
+PAGE_TEMPLATE = {
+    "page": {
+        "name": "",
+        "notes": ""
+    },
+    "cont": {},
+    "page_obj": None
+}
+TAB = "    "
+MENU_BUTTONS = {} # For changing button colors
 # FILES
 JSON_NAME = "db_info.json"
 DEFAULT_DB = "CHANGE WIKI"

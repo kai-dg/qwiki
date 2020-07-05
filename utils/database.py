@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
 from peewee import *
-from utils.models import Page
-from utils.models import Content
-from utils.models import Tag
 import ui.settings as s
 import os
 import json
-import sys
-#ABSPATH = os.path.dirname(os.path.realpath(__file__))
-#DB_INFO_PATH = os.path.join(ABSPATH, s.JSON_NAME)
 if not os.path.isfile(s.JSON_NAME):
     with open(s.JSON_NAME, "w") as f:
         template = {"active": "", "wikis": {}}

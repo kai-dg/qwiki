@@ -1,13 +1,25 @@
 #!/usr/bin/env python3
-"""Add page button frame"""
+"""Wiki Settings
+
+TODO:
+    Display Label above Edit Wiki showing which Database is targeted.
+    Display Label above import showing which is loaded.
+        import button changes to normal if loaded
+    Reorder left side:
+        Wiki Name:
+"""
 from peewee import *
+import os
 import tkinter as tk
 from tkinter import ttk
+from tkinter.filedialog import askopenfilename
 from ui.tk_helper import place
 import ui.settings as s
 import utils.database as db
 from utils.models import make_tables
 from utils.models import models_db_swap
+from ui.tk_helper import change_button_color
+
 
 def name_check(name):
     if len(name.split()) != 1:
@@ -22,11 +34,12 @@ def format_db_info() -> str:
     """Formats s.WIKI_DB_INFO"""
     pass
 
-# name change to WikiSettings?
-class ChangeWikiPage(tk.Frame):
-    def __init__(self, parent, status):
+class SettingsPage(tk.Frame):
+    def __init__(self, parent, button, status):
+        change_button_color(button)
         tk.Frame.__init__(self, parent)
         self.status = status
+        self.filepath = ""
         self.content = tk.Frame(parent, bg=s.FG, padx=18, pady=18)
         place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.layout()
@@ -66,6 +79,17 @@ class ChangeWikiPage(tk.Frame):
         else:
             self.errors["text"] = f"Could not find the wiki: {name}."
 
+    def get_filepath(self):
+        filename = askopenfilename()
+        if filename == "":
+            pass
+        elif ".db" not in os.path.basename(filename):
+            self.errors["text"] = "Incorrect file type. Please choose a '.db' file."
+        # Test if actual db
+        else:
+            self.filepath = filename
+            self.import_button.config(bg=s.SEARCHBG)
+
     def labels(self):
         swap_name = tk.Label(self.left, text="Load:", bg=s.FG,
                              fg=s.TEXT1, font=(s.FONT1, 9))
@@ -95,10 +119,8 @@ class ChangeWikiPage(tk.Frame):
         place(self.name_entry, h="", w=0.3, x=0.25, y=0.11)
         self.notes_entry = tk.Entry(self.left, bg=s.SEARCHFG)
         place(self.notes_entry, h="", w=0.3, x=0.25, y=0.16)
-        self.change_entry = tk.Entry(self.left, bg=s.SEARCHFG) # dropdown
+        self.change_entry = tk.Entry(self.left, bg=s.SEARCHFG) # change to dropdown
         place(self.change_entry, h="", w=0.3, x=0.25, y=0.26)
-        self.import_entry = tk.Entry(self.left, bg=s.SEARCHFG)
-        place(self.import_entry, h="", w=0.3, x=0.25, y=0.36)
         self.add_tag_entry = tk.Entry(self.left, bg=s.SEARCHFG)
         place(self.add_tag_entry, h="", w=0.3, x=0.25, y=0.46)
         
@@ -119,9 +141,12 @@ class ChangeWikiPage(tk.Frame):
         edit_notes_button = tk.Button(self.left, text="Desc.", bg=s.SEARCHBG,
                                       fg=s.TEXT3)
         place(edit_notes_button, h="", w=0.18, x=0.79, y=0.255)
-        import_button = tk.Button(self.left, text="Import", bg=s.SEARCHBG,
+        import_select = tk.Button(self.left, text="Browse...", bg=s.SEARCHBG,
+                                  fg=s.TEXT3, command=lambda: self.get_filepath())
+        place(import_select, h="", w=0.3, x=0.25, y=0.36)
+        self.import_button = tk.Button(self.left, text="Import", bg=s.BUTTON_R,
                                   fg=s.TEXT3)
-        place(import_button, h="", w=0.3, x=0.59, y=0.355)
+        place(self.import_button, h="", w=0.3, x=0.59, y=0.36)
         self.add_tag_button = tk.Button(self.left, text="Add", bg=s.SEARCHBG,
                                         fg=s.TEXT3)
         place(self.add_tag_button, h="", w=0.3, x=0.59, y=0.455)
@@ -135,7 +160,7 @@ class ChangeWikiPage(tk.Frame):
 
     def layout(self):
         """All partitions are relative to self.content"""
-        self.right = tk.Frame(self.content, bg="black")
+        self.right = tk.Frame(self.content, bg=s.FG)
         place(self.right, h=1, w=0.5, x=0.5, y=0)
         self.left = tk.Frame(self.content, bg=s.FG)
         place(self.left, h=1, w=0.5, x=0, y=0)
