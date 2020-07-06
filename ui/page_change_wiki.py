@@ -155,7 +155,7 @@ class SettingsPage(tk.Frame):
         self.info = tk.Label(self.right, bg=s.BG2, fg=s.SEARCHBG)
         place(self.info, h=0.92, w=1, x=0, y=0.08)
         self.errors = tk.Label(self.right, text="", anchor="w", bg=s.BG2,
-                               fg=s.TEXT1, font=(s.NORMAL_FONT, 12, "bold"), padx=10)
+                               fg=s.BUTTON_R, font=(s.NORMAL_FONT, 12, "bold"), padx=10)
         place(self.errors, h=0.08, w=1, x=0, y=0)
 
     def layout(self):

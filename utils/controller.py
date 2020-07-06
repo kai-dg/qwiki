@@ -33,22 +33,23 @@ class ModelCtrl:
         res["page"] = p
         return res
 
-    def add_content(self, data:dict) -> str:
+    def add_content(self, data:dict, target) -> str:
         """Args:
-            data: keys are page, title, idx, content, content_img,
-                  content_img_title
+            data: {idx: {title: content}, ...}
+            target: page obj
         Returns:
             str: message for display
         """
-        res = self.cont.create(
-            page = data["page"],
-            title = data["title"],
-            idx = data["idx"],
-            content = data["content"],
-            content_img = "",
-            content_img_title = ""
-        )
-        return f"Added {data['page'].name} Content Header: {data['title']}"
+        for k, v in data.items():
+            res = self.cont.create(
+                page = target,
+                title = v["title"],
+                idx = k,
+                content = v["cont"],
+                content_img = "",
+                content_img_title = ""
+            )
+        return ""
 
     def set_tag(self, new:str) -> str:
         """`new` should be just the tag without commas."""

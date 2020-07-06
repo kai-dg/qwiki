@@ -43,19 +43,18 @@ class AddPage(tk.Frame):
             q = DPage.select().where(DPage.name==data["page_name"])
             if len(q) != 0:
                 self.errors["text"] = "ERROR: Page Name exists."
-            else:
-                self.page_data["page_obj"] = 0
         if c:
             self.content_text.delete("1.0", tk.END)
             self.title.delete(0, "end")
             self.page_data["page"]["name"] = data["page_name"] # For DB query
-            page = fm.format_page(data["page_name"])
+            page = fm.format_title(data["page_name"])
             notes = fm.format_note(data["notes"])
             header = fm.format_header(data["header"])
             content = fm.format_content(data["content"])
             self.page_data["page"]["notes"] = notes
             self.page_data["cont"][s.IDX] = {
-                header: content
+                "title": header,
+                "cont": content
             }
             if s.IDX == 0:
                 self.d_info.append(f"{page}{notes}")
@@ -88,6 +87,8 @@ class AddPage(tk.Frame):
         """Executing Create Page button. Resets global variables."""
         Ctrl = set_ctrl()
         page = Ctrl.add_page(self.page_data["page"])
+        self.page_data["page_obj"] = page["page"]
+        cont = Ctrl.add_content(self.page_data["cont"], self.page_data["page_obj"])
         self.errors["text"] = page["message"]
         self.clear_all()
 
@@ -109,7 +110,7 @@ class AddPage(tk.Frame):
                              anchor="nw", padx=20, pady=20, justify="left")
         place(self.info, h=0.92, w=1, x=0, y=0.08)
         self.errors = tk.Label(self.right, text="", anchor="w", bg=s.BG2,
-                               fg=s.TEXT1, font=(s.NORMAL_FONT, 12, "bold"), padx=10)
+                               fg=s.BUTTON_R, font=(s.NORMAL_FONT, 12, "bold"), padx=10)
         place(self.errors, h=0.08, w=1, x=0, y=0)
 
     def labels(self):

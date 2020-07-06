@@ -4,14 +4,14 @@ import ui.settings as s
 import re
 
 
-def format_page(name:str) -> str:
+def format_title(name:str) -> str:
     res = f"=== {name} ===\n"
     return res
 
 def format_note(notes:str) -> str:
-    res = f"{notes}\n\n"
+    res = f"{notes}\n"
     if notes != "":
-        res = f"[Notes] {notes}\n\n"
+        res = f"[Notes] {notes}\n"
     return res
 
 def format_header(header:str) -> str:

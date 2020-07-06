@@ -6,6 +6,7 @@ from ui.tk_helper import place
 import ui.settings as s
 from utils.models import DContent
 from utils.models import DPage
+import utils.formatter as fm
 
 
 class WikiPage(tk.Frame):
@@ -19,16 +20,36 @@ class WikiPage(tk.Frame):
         self.check_entry()
 
     def check_entry(self):
-        q = DPage.select().where(DPage.name==s.TARGET)
-        if len(q) != 0:
-            self.draw_query(q[0], "cont obj")
+        qpage = DPage.select().where(DPage.name==s.TARGET)
+        qcont = DContent.select().where(DContent.page==qpage)
+        if len(qpage) != 0:
+            self.draw_query(qpage[0], qcont)
         else:
             self.not_found()
             s.TARGET = ""
 
     def draw_query(self, page, cont):
-        title = tk.Label(self.content, text=page.name)
-        place(title, h=0.2, w=0.2, x=0.55, y=0.4)
+        sections = {i: tk.Label for i in range(len(cont)*2)}
+        ptitle = fm.format_title(page.name)
+        all_page = f"{ptitle}{page.notes}"
+        base = tk.Frame(self.content, bg=s.BG2, padx=25, pady=25)
+        place(base, h=1, w=0.5, x=0.402, y=0)
+        title = tk.Label(base, text=ptitle.rstrip(), font=(s.FONT1, 22, "bold"),
+                         bg=s.BG2, fg=s.SEARCHBG, justify="left")
+        title.grid(row=1, sticky="w", rowspan=1)
+        notes = tk.Label(base, text=page.notes, font=(s.FONT1, 12), bg=s.BG2,
+                         fg=s.SEARCHBG, justify="left")
+        notes.grid(row=2, sticky="w", rowspan=1, padx=10)
+        idx = 0
+        for c in cont:
+            temp = f"{c.title}{c.content}"
+            ctitle = sections[idx](base, text=c.title.rstrip(), justify="left", bg=s.BG2,
+                                   fg=s.SEARCHBG, font=(s.FONT1, 17, "bold"))
+            ctitle.grid(row=(idx+3), columnspan=1, sticky="w")
+            ccontent = sections[idx+1](base, text=c.content, justify="left", bg=s.BG2,
+                                       fg=s.SEARCHBG, font=(s.FONT1, 12))
+            ccontent.grid(row=(idx+4), columnspan=1, sticky="w")
+            idx += 2
 
     def not_found(self):
         self.error = tk.Frame(self.parent, bg=s.FG)

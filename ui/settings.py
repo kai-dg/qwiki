@@ -32,13 +32,12 @@ PAGE_NAME = ""
 CONTENT = {} # idx: {header: content}
 WIKI_LIST = ["test1"]
 WIKI_DB_INFO = {}
-# cont format: {idx: {title: content}}
 PAGE_TEMPLATE = {
     "page": {
         "name": "",
         "notes": ""
     },
-    "cont": {},
+    "cont": {}, # cont format: {idx: {title: content}}
     "page_obj": None
 }
 TAB = "    "
