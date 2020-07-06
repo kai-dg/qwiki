@@ -20,11 +20,6 @@ NORMAL_FONT = "Arial"
 #SIZES
 W_HEIGHT = 750
 W_WIDTH = 700
-# MESSAGES
-WELCOME = """Thanks for using Qwiki"""
-START_HELP = "Get Started Here:\nADD a Wiki"
-SEARCH_HELP = "Searchbar Here"
-NAME_HELP = "Current Wiki"
 # GLOBAL VARS
 TARGET = None
 IDX = 0
@@ -45,5 +40,6 @@ MENU_BUTTONS = {} # For changing button colors
 # FILES
 JSON_NAME = "db_info.json"
 DEFAULT_DB = "CHANGE WIKI"
-DB_FILE = ".data"
+#DB_FILE = ".data"
+DB_FILE = "Test.db"
 DB = SqliteDatabase(DB_FILE)

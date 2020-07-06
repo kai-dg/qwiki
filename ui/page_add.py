@@ -11,6 +11,7 @@ from utils.models import DPage
 from utils.models import DContent
 import utils.formatter as fm
 from utils.models import set_ctrl
+import ui.language as en
 
 
 def check_contents(data):
@@ -42,7 +43,7 @@ class AddPage(tk.Frame):
         if self.page_data["page_obj"] == None:
             q = DPage.select().where(DPage.name==data["page_name"])
             if len(q) != 0:
-                self.errors["text"] = "ERROR: Page Name exists."
+                self.errors["text"] = en.ERR_ADD1
         if c:
             self.content_text.delete("1.0", tk.END)
             self.title.delete(0, "end")
@@ -63,7 +64,7 @@ class AddPage(tk.Frame):
             self.info["text"] = "".join(self.d_info)
             s.IDX += 1
         else:
-            self.errors["text"] = "ERROR: Page Name or Header is missing."
+            self.errors["text"] = en.ERR_ADD2
 
     def clear_all(self):
         self.name.delete(0, "end")
@@ -114,13 +115,13 @@ class AddPage(tk.Frame):
         place(self.errors, h=0.08, w=1, x=0, y=0)
 
     def labels(self):
-        name_label = tk.Label(self.left, bg=s.FG, fg=s.TEXT1, text="Page Name:",
+        name_label = tk.Label(self.left, bg=s.FG, fg=s.TEXT1, text=en.LAB_ADD1,
                               font=(s.FONT1, 9))
         place(name_label, h="", w=0.2, x=0, y=0.0)
-        notes_title = tk.Label(self.left, bg=s.FG, fg=s.TEXT1, text="Notes:",
+        notes_title = tk.Label(self.left, bg=s.FG, fg=s.TEXT1, text=en.LAB_ADD2,
                                  font=(s.FONT1, 9))
         place(notes_title, h="", w=0.2, x=0, y=0.05)
-        content_title = tk.Label(self.left, bg=s.FG, fg=s.TEXT1, text="Header:",
+        content_title = tk.Label(self.left, bg=s.FG, fg=s.TEXT1, text=en.LAB_ADD3,
                                  font=(s.FONT1, 9))
         place(content_title, h="", w=0.2, x=0, y=0.14)
 
@@ -133,21 +134,21 @@ class AddPage(tk.Frame):
         place(self.title, h="", w=0.67, x=0.25, y=0.14)
         self.content_text = tk.Text(self.left, bg=s.SEARCHBG, font=(s.NORMAL_FONT, 9),
                                     fg=s.FG, padx=5, pady=5)
-        place(self.content_text, h=0.65, w=0.98, x=0, y=0.20)
+        place(self.content_text, h=0.35, w=0.98, x=0, y=0.20)
 
     def buttons(self):
-        add = tk.Button(self.left, text="Add Content", font=(s.FONT1, 9),
+        add = tk.Button(self.left, text=en.ADD_B1, font=(s.FONT1, 9),
                            bg=s.SEARCHBG, fg=s.TEXT3, command=lambda: self.add_content(self.get_inputs()))
-        place(add, h="", w=0.3, x=0.33, y=0.875)
-        undo = tk.Button(self.left, text="Undo", font=(s.FONT1, 9),
+        place(add, h="", w=0.3, x=0.33, y=0.575)
+        undo = tk.Button(self.left, text=en.ADD_B2, font=(s.FONT1, 9),
                          bg=s.SEARCHBG, fg=s.TEXT3, command=lambda: self.undo_one())
-        place(undo, h="", w=0.16, x=0.82, y=0.875)
-        create = tk.Button(self.left, text="Create Page", font=(s.FONT1, 9),
+        place(undo, h="", w=0.16, x=0.82, y=0.575)
+        create = tk.Button(self.left, text=en.ADD_B3, font=(s.FONT1, 9),
                            bg=s.BUTTON_D, fg=s.TEXT1, command=lambda: self.create_page())
-        place(create, h="", w=0.3, x=0.33, y=0.942)
-        clear = tk.Button(self.left, text="Clear", font=(s.FONT1, 9),
+        place(create, h="", w=0.3, x=0.33, y=0.642)
+        clear = tk.Button(self.left, text=en.ADD_B4, font=(s.FONT1, 9),
                           bg=s.SEARCHBG, fg=s.TEXT3, command=lambda: self.clear_all())
-        place(clear, h="", w=0.16, x=0, y=0.875)
+        place(clear, h="", w=0.16, x=0, y=0.575)
 
     def layout(self):
         """All partitions are relative to self.content"""

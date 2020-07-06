@@ -9,3 +9,4 @@ qwiki_app.spec
 utils/db_info.json
 db_info.json
 .data
+test.py

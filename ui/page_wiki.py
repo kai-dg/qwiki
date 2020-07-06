@@ -7,7 +7,7 @@ import ui.settings as s
 from utils.models import DContent
 from utils.models import DPage
 import utils.formatter as fm
-
+import ui.language as en
 
 class WikiPage(tk.Frame):
     def __init__(self, parent, entry):
@@ -51,8 +51,12 @@ class WikiPage(tk.Frame):
             ccontent.grid(row=(idx+4), columnspan=1, sticky="w")
             idx += 2
 
+    def suggestions(self):
+        """Implement fuzzy finder here. search -> suggestions -> not_found"""
+        pass
+
     def not_found(self):
         self.error = tk.Frame(self.parent, bg=s.FG)
         self.error.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04, anchor="n")
-        message = tk.Label(self.error, text="Page not found.")
+        message = tk.Label(self.error, text=en.WIKI_ERR1)
         place(message, h="", w=0.3, x=0.35, y=0.45)
