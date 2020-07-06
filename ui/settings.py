@@ -39,7 +39,7 @@ TAB = "    "
 MENU_BUTTONS = {} # For changing button colors
 # FILES
 JSON_NAME = "db_info.json"
-DEFAULT_DB = "CHANGE WIKI"
+DEFAULT_DB = "ADD WIKI"
 #DB_FILE = ".data"
 DB_FILE = "Test.db"
 DB = SqliteDatabase(DB_FILE)

@@ -20,7 +20,7 @@ class HelpPage(tk.Frame):
         triangle2.create_polygon((0, 70, 35, 120, 70, 70), fill=s.BUTTON_R)
         start_here = tk.Label(self.content, bg=s.FG, fg=s.SEARCHFG, text=en.START_HELP,
                               font=(s.FONT1, 12, "bold"))
-        place(triangle2, h=0.22, w=0.12, x=0.65, y=0.82)
+        place(triangle2, h=0.22, w=0.12, x=0.66, y=0.82)
         place(start_here, h=0.08, w=0.36, x=0.53, y=0.89)
         show_button = tk.Button(self.content, text=en.HELP_B1,
                                 font=(s.FONT1, 9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,

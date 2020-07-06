@@ -47,7 +47,7 @@ class AddPage(tk.Frame):
         if c:
             self.content_text.delete("1.0", tk.END)
             self.title.delete(0, "end")
-            self.page_data["page"]["name"] = data["page_name"] # For DB query
+            self.page_data["page"]["name"] = data["page_name"]
             page = fm.format_title(data["page_name"])
             notes = fm.format_note(data["notes"])
             header = fm.format_header(data["header"])
