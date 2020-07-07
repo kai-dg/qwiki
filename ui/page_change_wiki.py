@@ -19,6 +19,7 @@ import ui.language as en
 import ui.settings as s
 import utils.globals as g
 import utils.database as db
+from utils.models import change_database
 from utils.models import make_tables
 
 
@@ -61,13 +62,8 @@ class SettingsPage(tk.Frame):
             self.swap["values"] = g.WIKI_LIST
             self.swap.set(res)
             self.status["text"] = res
-            db.load_profile(res)
-            g.DB_FILE = f"{res}.db"
-            # Changing DB, making its tables
-            g.DB.close()
-            g.DB = SqliteDatabase(g.DB_FILE)
-            g.DB.connect()
-            g.DBP.initialize(g.DB)
+            db.change_profile(res)
+            change_database(res)
             make_tables()
         else:
             self.errors["text"] = en.SETT_ERR1

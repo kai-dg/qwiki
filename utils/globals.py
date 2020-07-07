@@ -15,7 +15,8 @@ JSON_TEMPLATE = {
 	}
 }
 # GLOBAL VARS
-TARGET = None # Page object container
+TARGET = "" # Page name holder
+TARGET_PAGE = None # Page object holder
 IDX = 0 # Content.idx tracker
 PAGE_NAME = ""
 CONTENT = {} # idx: {header: content}

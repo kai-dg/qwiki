@@ -5,6 +5,7 @@ import ui.settings as s
 import utils.globals as g
 import utils.database as db
 from ui.tk_helper import place
+from ui.tk_helper import refresh_globals
 import ui.language as en
 from ui.page_wiki import WikiPage
 from ui.page_change_wiki import SettingsPage
@@ -12,8 +13,7 @@ from ui.page_add import AddPage
 from ui.page_update import UpdatePage
 from ui.page_confirms import DelConfirmPage
 from ui.page_help import HelpPage
-from utils.models import init_database
-init_database()
+from utils.models import init_database_info
 
 
 class App():
@@ -26,6 +26,7 @@ class App():
         self.search_bar()
         self.bottom_buttons()
         self.content_f()
+        init_database_info()
         self.root.mainloop()
         g.DB.close()
 
@@ -34,11 +35,13 @@ class App():
         self.content.destroy()
 
     def content_f(self):
+        """Initial screen when starting the app"""
         self.content = tk.Frame(self.frame, bg=s.FG)
         self.content.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04, anchor="n")
         self.replace(HelpPage(self.frame, "help"))
 
     def search_bar(self):
+        """Everything in the top section."""
         frame_search = tk.Frame(self.frame, bg=s.SEARCHBG)
         place(frame_search, h=0.04, w=2, x=0.1, y=0, a="n")
         self.searchlabel = tk.Label(frame_search, text=g.DEFAULT_DB, bg=s.SEARCHBG,
@@ -61,29 +64,31 @@ class App():
         place(search_by_tag, h=1, w=0.05, x=0.90, y=0)
 
     def bottom_buttons(self):
+        """Everything on the bottom section."""
         self.frame_editor = tk.Frame(self.frame, bg="red")
         place(self.frame_editor, h=0.03, w=1, x=0.5, y=1, a="s")
-        self.add_wiki = tk.Button(self.frame_editor, text=en.BOTT_B1, font=(s.FONT1, 9, "bold"),
-                                    bg=s.SEARCHBG, fg=s.TEXT3,
-                             command=lambda: self.replace(AddPage(self.frame, "add")))
+        self.add_wiki = tk.Button(self.frame_editor, text=en.BOTT_B1, font=(s.FONT1, 9,
+                                  "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
+                                  command=lambda: self.replace(AddPage(self.frame, "add")))
         place(self.add_wiki, h=1, w=0.2, x=0, y=0)
-        self.update_wiki = tk.Button(self.frame_editor, text=en.BOTT_B2, font=(s.FONT1, 9, "bold"),
-                                    bg=s.SEARCHBG, fg=s.TEXT3,
-                                command=lambda: self.replace(UpdatePage(self.frame, "update")))
+        self.update_wiki = tk.Button(self.frame_editor, text=en.BOTT_B2, font=(s.FONT1,
+                                     9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
+                                     command=lambda: self.replace(UpdatePage(self.frame, "update")))
         place(self.update_wiki, h=1, w=0.2, x=0.2, y=0)
-        self.delete_wiki = tk.Button(self.frame_editor, text=en.BOTT_B3, font=(s.FONT1, 9, "bold"),
-                                    bg=s.SEARCHBG, fg=s.TEXT3,
-                                command=lambda: self.replace(DelConfirmPage(
-                                self.frame)))
+        self.delete_wiki = tk.Button(self.frame_editor, text=en.BOTT_B3, font=(
+                                     s.FONT1, 9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
+                                     command=lambda: self.replace(DelConfirmPage(
+                                     self.frame)))
         place(self.delete_wiki, h=1, w=0.2, x=0.4, y=0)
-        self.sett_wiki = tk.Button(self.frame_editor, text=en.BOTT_B4, font=(s.FONT1, 9, "bold"),
-                                    bg=s.SEARCHBG, fg=s.TEXT3,
-                                    command=lambda: self.replace(SettingsPage(self.frame, "sett",
-                                    self.searchlabel)))
+        self.sett_wiki = tk.Button(self.frame_editor, text=en.BOTT_B4, font=(
+                                   s.FONT1, 9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
+                                    command=lambda: [self.replace(SettingsPage(self.frame, "sett",
+                                    self.searchlabel)), refresh_globals()])
         place(self.sett_wiki, h=1, w=0.2, x=0.6, y=0)
-        self.help_wiki = tk.Button(self.frame_editor, text=en.BOTT_B5, font=(s.FONT1, 9, "bold"),
-                                    bg=s.SEARCHBG, fg=s.TEXT3,
-                                    command=lambda: self.replace(HelpPage(self.frame, "help")))
+        self.help_wiki = tk.Button(self.frame_editor, text=en.BOTT_B5, font=(s.FONT1,
+                                   9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
+                                   command=lambda: [self.replace(HelpPage(self.frame,
+                                   "help")), refresh_globals()])
         place(self.help_wiki, h=1, w=0.2, x=0.8, y=0)
         g.MENU_BUTTONS = {
             "add": self.add_wiki,

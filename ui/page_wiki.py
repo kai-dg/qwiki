@@ -15,22 +15,21 @@ class WikiPage(tk.Frame):
         self.parent = parent
         tk.Frame.__init__(self, parent)
         clear_colors()
-        g.TARGET = entry.title()
+        g.TARGET = entry.title().rstrip()
         self.content = tk.Frame(parent, bg=s.FG, padx=10, pady=10)
         place(self.content, h=0.93, w=2, x=0.2, y=0.04, a="n")
-        self.Query = set_query(g.TARGET)
         self.base = tk.Frame(self.content, bg=s.BG2, padx=25, pady=25)
         self.query_entry()
 
-    def draw_query(self, page):
-        cont = page.content
+    def draw_query(self, query):
+        cont = query.page_content()
         sections = {i: tk.Label for i in range(len(cont)*2)}
-        ptitle = fm.format_title(page.name)
-        all_page = f"{ptitle}{page.notes}"
+        ptitle = fm.format_title(query.page_obj.name)
+        all_page = f"{ptitle}{query.page_obj.notes}"
         title = tk.Label(self.base, text=ptitle.rstrip(), font=(s.FONT1, 22, "bold"),
                          bg=s.BG2, fg=s.SEARCHBG, justify="left")
         title.grid(row=1, sticky="w", rowspan=1)
-        notes = tk.Label(self.base, text=page.notes, font=(s.FONT1, 12), bg=s.BG2,
+        notes = tk.Label(self.base, text=query.page_obj.notes, font=(s.FONT1, 12), bg=s.BG2,
                          fg=s.SEARCHBG, justify="left")
         notes.grid(row=2, sticky="w", rowspan=1, padx=10)
         idx = 0
@@ -57,12 +56,14 @@ class WikiPage(tk.Frame):
 
     def query_entry(self):
         """Implement fuzzy finder here. search -> query -> suggestions -> not_found"""
-        q = self.Query.full_page_match()
+        query = set_query(g.TARGET)
+        q = query.full_page_match()
         place(self.base, h=1, w=0.5, x=0.402, y=0)
         if len(q) == 1:
-            self.draw_query(q[0])
+            self.draw_query(query)
+            g.TARGET_PAGE = q[0]
         else:
-            q = self.Query.fuzzy_page_match()
+            q = query.fuzzy_page_match()
             self.suggestions_page(q)
         if len(q) == 0:
             self.not_found()

@@ -20,3 +20,8 @@ def clear_colors():
 def change_button_color(clicked):
 	clear_colors()
 	g.MENU_BUTTONS[clicked].config(bg=s.FG, fg=s.TEXT1)
+
+def refresh_globals():
+    """Refreshes globals that don't need to be carried anymore"""
+    g.TARGET_PAGE = None
+    g.TARGET = ""

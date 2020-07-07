@@ -44,6 +44,7 @@ class ModelCtrl:
         """
         for k, v in data.items():
             res = self.cont.create(
+                page=target,
                 title = v["title"],
                 idx = k,
                 content = v["cont"],
@@ -51,7 +52,6 @@ class ModelCtrl:
                 content_img_title = ""
             )
             res.save()
-            target.content.add(res)
         return ""
 
     def set_tag(self, new:str) -> str:
@@ -62,15 +62,22 @@ class ModelCtrl:
         return f"Made new tag {new}"
 
 class Query:
-    def __init__(self, name, dpage, drel, dtag=None):
-        self.tag = dtag
-        self.page = dpage
-        self.rel = drel
+    def __init__(self, name:str, page, cont, rel, tag=None):
+        self.tag = tag
+        self.page = page
+        self.content = cont
+        self.rel = rel
         self.name = name
+        self.page_obj = None
+
+    def page_content(self):
+        q = self.content.select().where(self.content.page==self.page_obj)
+        return q
 
     def full_page_match(self) -> list:
         p = self.page.select().where(self.page.name==self.name)
         if len(p) == 1:
+            self.page_obj = p[0]
             return p
         return []
 

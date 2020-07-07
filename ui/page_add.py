@@ -69,6 +69,7 @@ class AddPage(tk.Frame):
             self.info["text"] = "".join(self.d_info)
             g.IDX += 1
         else:
+            print("adding erro")
             self.errors["text"] = en.ERR_ADD2
 
     def clear_all(self):

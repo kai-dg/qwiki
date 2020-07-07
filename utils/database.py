@@ -25,7 +25,7 @@ def create_profile(name, notes):
 	data["wikis"][name] = notes
 	write_json(data)
 
-def load_profile(name):
+def change_profile(name):
 	data = read_json()
 	data["active"] = name
 	write_json(data)

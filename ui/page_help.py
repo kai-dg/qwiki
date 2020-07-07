@@ -13,15 +13,9 @@ class HelpPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.content = tk.Frame(parent, bg=s.FG, padx=10, pady=10)
         place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
-        lab = tk.Label(self.content, text=en.WELCOME, font=(s.FONT1, 12, "bold"),
+        welcome = tk.Label(self.content, text=en.WELCOME, font=(s.FONT1, 12, "bold"),
                        bg=s.FG, fg=s.SEARCHFG)
-        lab.place(relheight=1, relwidth=1, relx=0, rely=0)
-        triangle2 = tk.Canvas(self.content, bg=s.FG, highlightthickness=0)
-        triangle2.create_polygon((0, 70, 35, 120, 70, 70), fill=s.BUTTON_R)
-        start_here = tk.Label(self.content, bg=s.FG, fg=s.SEARCHFG, text=en.START_HELP,
-                              font=(s.FONT1, 12, "bold"))
-        place(triangle2, h=0.22, w=0.12, x=0.66, y=0.82)
-        place(start_here, h=0.08, w=0.36, x=0.53, y=0.89)
+        welcome.place(relheight=1, relwidth=1, relx=0, rely=0)
         show_button = tk.Button(self.content, text=en.HELP_B1,
                                 font=(s.FONT1, 9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
                                 command=lambda: self.show_more())
@@ -56,3 +50,10 @@ class HelpPage(tk.Frame):
         tri5.create_polygon((0, 70, 35, 120, 70, 70), fill=s.SEARCHBG)
         place(tri5, h=0.22, w=0.12, x=0.45, y=0.82)
         # delete page
+
+        triangle2 = tk.Canvas(self.content, bg=s.FG, highlightthickness=0)
+        triangle2.create_polygon((0, 70, 35, 120, 70, 70), fill=s.BUTTON_R)
+        start_here = tk.Label(self.content, bg=s.FG, fg=s.SEARCHFG, text=en.START_HELP,
+                              font=(s.FONT1, 12, "bold"))
+        place(triangle2, h=0.22, w=0.12, x=0.66, y=0.82)
+        place(start_here, h=0.08, w=0.30, x=0.562, y=0.89)

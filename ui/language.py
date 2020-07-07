@@ -10,10 +10,10 @@ BOTT_B5 = "Help"
 
 # Help Page
 WELCOME = """Thanks for using Qwiki"""
-START_HELP = "Get Started Here:\nADD a Wiki"
-SEARCH_HELP = "Searchbar Here"
+START_HELP = "Wiki Settings"
+SEARCH_HELP = "Searchbar"
 NAME_HELP = "Current Wiki"
-HELP_B1 = "Click for more help"
+HELP_B1 = "Click for UI info"
 
 # Add Page
 ERR_ADD1 = "ERROR: Page name exists."
@@ -56,3 +56,4 @@ UP_ERR_1 = "Search for a page, and then you can update it."
 # Confirmation Pages
 CONFIRM_1 = "Are you sure you want to delete"
 CONFIRM_ERR_1 = "Search for a page, and then you can delete it."
+CONFIRM_SUCCESS = "has been deleted."
