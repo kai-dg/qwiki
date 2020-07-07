@@ -6,11 +6,11 @@ import utils.globals as g
 from utils.controller import ModelCtrl
 from utils.controller import Query
 import os
-
+# Open app -> no database yet
 
 class BaseModel(Model):
     class Meta:
-        database = g.DB
+        database = g.DBP
 
 class Content(BaseModel):
     """Wiki page's content model"""
@@ -46,44 +46,25 @@ class Relations(BaseModel):
     page = ForeignKeyField(Page)
     pages = ManyToManyField(Page, backref="pages")
 
-# Dynamic Models that can change db with ._meta.database
-# Use these as the models instead of above
-DPage = Page
-DContent = Content
-DTag = Tag
-DDInfo = DatabaseInfo
-DRelations = Relations
-
-def models_db_swap():
-    if os.path.isfile(".qwiki.data"):
-        os.remove(".qwiki.data")
-    g.DB = SqliteDatabase(g.DB_FILE)
-    DPage._meta.database = g.DB
-    DContent._meta.database = g.DB
-    DTag._meta.database = g.DB
-    DDInfo._meta.database = g.DB
-    DRelations._meta.database = g.DB
-
 def make_tables():
     """Make preset database info here"""
-    g.DB.create_tables([DDInfo, DPage, DContent, DTag, DRelations])
-    g.DB.create_tables([DRelations.pages.get_through_model()])
-    g.DB.create_tables([DTag.pages.get_through_model()])
-    g.DB.create_tables([DPage.content.get_through_model()])
-    DDInfo.create(set_tags="").save()
+    g.DB.create_tables([DatabaseInfo, Page, Content, Tag, Relations])
+    g.DB.create_tables([Relations.pages.get_through_model()])
+    g.DB.create_tables([Tag.pages.get_through_model()])
+    g.DB.create_tables([Page.content.get_through_model()])
+    DatabaseInfo.create(set_tags="").save()
 
 def set_ctrl():
-    m = ModelCtrl(DPage, DContent, DTag, DDInfo, DRelations)
+    m = ModelCtrl(Page, Content, Tag, DatabaseInfo, Relations)
     return m
 
 def set_query(name):
-    q = Query(name, DPage, DRelations)
+    q = Query(name, Page, Relations)
     return q
     
 def init_database():
     g.WIKI_DB_INFO = db.read_json()
     g.DEFAULT_DB = g.WIKI_DB_INFO["active"] if g.WIKI_DB_INFO["active"] != "" else g.DEFAULT_DB
     g.DB_FILE = f"{g.DEFAULT_DB}.db"
-    models_db_swap()
     g.WIKI_LIST = list(g.WIKI_DB_INFO["wikis"])
     g.WIKI_LIST = [""] if g.WIKI_LIST == [] else g.WIKI_LIST

@@ -20,7 +20,6 @@ import ui.settings as s
 import utils.globals as g
 import utils.database as db
 from utils.models import make_tables
-from utils.models import models_db_swap
 
 
 def name_check(name):
@@ -68,12 +67,8 @@ class SettingsPage(tk.Frame):
             g.DB.close()
             g.DB = SqliteDatabase(g.DB_FILE)
             g.DB.connect()
-            models_db_swap()
+            g.DBP.initialize(g.DB)
             make_tables()
-            if os.path.isfile(".qwiki.data"):
-                old = SqliteDatabase(".qwiki.data")
-                old.close()
-                os.remove(".qwiki.data")
         else:
             self.errors["text"] = en.SETT_ERR1
         self.name_entry.delete(0, "end")

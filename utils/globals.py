@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 from peewee import *
+# DATABASE
+DB_FILE = "Default.db"
+DB = SqliteDatabase(DB_FILE)
+DBP = DatabaseProxy()
+DBP.initialize(DB) # Database connects when models.py gets imported from database.py
+DEFAULT_DB = "Default" # Display name on screen
 # FILES
 JSON_NAME = "db_info.json"
-DEFAULT_DB = "ADD A WIKI"
-DB_FILE = ".qwiki.data"
-DB = SqliteDatabase(DB_FILE)
+JSON_TEMPLATE = {
+	"active": "Default",
+	"wikis": {
+		"Default": "Change my name and description"
+	}
+}
 # GLOBAL VARS
 TARGET = None # Page object container
 IDX = 0 # Content.idx tracker

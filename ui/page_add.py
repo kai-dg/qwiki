@@ -8,8 +8,7 @@ import ui.settings as s
 from ui.tk_helper import place
 from ui.tk_helper import change_button_color
 import ui.language as en
-from utils.models import DPage
-from utils.models import DContent
+from utils.models import Page
 import utils.formatter as fm
 from utils.models import set_ctrl
 import utils.globals as g
@@ -47,7 +46,7 @@ class AddPage(tk.Frame):
         self.errors["text"] = ""
         c = check_contents(data)
         if self.page_data["page_obj"] == None:
-            q = DPage.select().where(DPage.name==data["page_name"])
+            q = Page.select().where(Page.name==data["page_name"])
             if len(q) != 0:
                 self.errors["text"] = en.ERR_ADD1
         if c:

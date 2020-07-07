@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 from peewee import *
 import utils.globals as g
+from utils.models import make_tables
 import os
 import json
 if not os.path.isfile(g.JSON_NAME):
     with open(g.JSON_NAME, "w") as f:
-        template = {"active": "", "wikis": {}}
+        template = g.JSON_TEMPLATE
         json.dump(template, f)
+        make_tables()
 
 
 def read_json() -> dict:
