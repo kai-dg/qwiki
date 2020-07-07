@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Database stuff"""
 from peewee import *
-import ui.settings as s
+import utils.database as db
+import utils.globals as g
 from utils.controller import ModelCtrl
 from utils.controller import Query
+import os
 
 
 class BaseModel(Model):
     class Meta:
-        database = s.DB
+        database = g.DB
 
 class Content(BaseModel):
     """Wiki page's content model"""
@@ -53,19 +55,21 @@ DDInfo = DatabaseInfo
 DRelations = Relations
 
 def models_db_swap():
-    s.DB = SqliteDatabase(s.DB_FILE)
-    DPage._meta.database = s.DB
-    DContent._meta.database = s.DB
-    DTag._meta.database = s.DB
-    DDInfo._meta.database = s.DB
-    DRelations._meta.database = s.DB
+    if os.path.isfile(".qwiki.data"):
+        os.remove(".qwiki.data")
+    g.DB = SqliteDatabase(g.DB_FILE)
+    DPage._meta.database = g.DB
+    DContent._meta.database = g.DB
+    DTag._meta.database = g.DB
+    DDInfo._meta.database = g.DB
+    DRelations._meta.database = g.DB
 
 def make_tables():
     """Make preset database info here"""
-    s.DB.create_tables([DDInfo, DPage, DContent, DTag, DRelations])
-    s.DB.create_tables([DRelations.pages.get_through_model()])
-    s.DB.create_tables([DTag.pages.get_through_model()])
-    s.DB.create_tables([DPage.content.get_through_model()])
+    g.DB.create_tables([DDInfo, DPage, DContent, DTag, DRelations])
+    g.DB.create_tables([DRelations.pages.get_through_model()])
+    g.DB.create_tables([DTag.pages.get_through_model()])
+    g.DB.create_tables([DPage.content.get_through_model()])
     DDInfo.create(set_tags="").save()
 
 def set_ctrl():
@@ -76,3 +80,10 @@ def set_query(name):
     q = Query(name, DPage, DRelations)
     return q
     
+def init_database():
+    g.WIKI_DB_INFO = db.read_json()
+    g.DEFAULT_DB = g.WIKI_DB_INFO["active"] if g.WIKI_DB_INFO["active"] != "" else g.DEFAULT_DB
+    g.DB_FILE = f"{g.DEFAULT_DB}.db"
+    models_db_swap()
+    g.WIKI_LIST = list(g.WIKI_DB_INFO["wikis"])
+    g.WIKI_LIST = [""] if g.WIKI_LIST == [] else g.WIKI_LIST

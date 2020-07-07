@@ -14,12 +14,13 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 from ui.tk_helper import place
+from ui.tk_helper import change_button_color
+import ui.language as en
 import ui.settings as s
+import utils.globals as g
 import utils.database as db
 from utils.models import make_tables
 from utils.models import models_db_swap
-from ui.tk_helper import change_button_color
-import ui.language as en
 
 
 def name_check(name):
@@ -32,7 +33,7 @@ def format_tag_info() -> str:
     pass
 
 def format_db_info() -> str:
-    """Formats s.WIKI_DB_INFO"""
+    """Formats g.WIKI_DB_INFO"""
     pass
 
 class SettingsPage(tk.Frame):
@@ -53,22 +54,26 @@ class SettingsPage(tk.Frame):
         if name_check(name):
             res = name.capitalize()
             db.create_profile(res, notes)
-            s.WIKI_DB_INFO = db.read_json()
+            g.WIKI_DB_INFO = db.read_json()
             self.errors["text"] = f"{en.SETT_ADD1} {res}"
-            s.DEFAULT_DB = res
+            g.DEFAULT_DB = res
             self.loaded["text"] = res
-            s.WIKI_LIST.append(res)
-            self.swap["values"] = s.WIKI_LIST
+            g.WIKI_LIST.append(res)
+            self.swap["values"] = g.WIKI_LIST
             self.swap.set(res)
             self.status["text"] = res
             db.load_profile(res)
-            s.DB_FILE = f"{res}.db"
+            g.DB_FILE = f"{res}.db"
             # Changing DB, making its tables
-            s.DB.close()
-            s.DB = SqliteDatabase(s.DB_FILE)
-            s.DB.connect()
+            g.DB.close()
+            g.DB = SqliteDatabase(g.DB_FILE)
+            g.DB.connect()
             models_db_swap()
             make_tables()
+            if os.path.isfile(".qwiki.data"):
+                old = SqliteDatabase(".qwiki.data")
+                old.close()
+                os.remove(".qwiki.data")
         else:
             self.errors["text"] = en.SETT_ERR1
         self.name_entry.delete(0, "end")
@@ -76,7 +81,7 @@ class SettingsPage(tk.Frame):
 
     def delete_wiki(self, name):
         res = f"{name}"
-        if s.WIKI_DB_INFO["wikis"].get(res, "") != "":
+        if g.WIKI_DB_INFO["wikis"].get(res, "") != "":
             db.delete_profile(res)
         else:
             self.errors["text"] = f"{en.SETT_ERR2} {name}."
@@ -86,13 +91,13 @@ class SettingsPage(tk.Frame):
         if filename == "":
             pass
         elif ".db" not in os.path.basename(filename):
-            self.import_di.config(fg=s.BUTTON_R)
-            self.import_di["text"] = en.SETT_ERR3
+            self.import_display.config(fg=s.BUTTON_R)
+            self.import_display["text"] = en.SETT_ERR3
         # Test if actual db
         else:
             self.filepath = filename
-            self.import_di.config(fg=s.SEARCHBG)
-            self.import_di["text"] = filename
+            self.import_display.config(fg=s.SEARCHBG)
+            self.import_display["text"] = filename
             self.import_button.config(bg=s.SEARCHBG)
 
     def labels(self):
@@ -120,7 +125,7 @@ class SettingsPage(tk.Frame):
         place(self.name_entry, h="", w=0.3, x=0.25, y=0.01)
         self.notes_entry = tk.Entry(self.left, bg=s.SEARCHFG)
         place(self.notes_entry, h="", w=0.3, x=0.25, y=0.05)
-        self.swap = ttk.Combobox(self.left, value=s.WIKI_LIST)
+        self.swap = ttk.Combobox(self.left, value=g.WIKI_LIST)
         self.swap["state"] = "readonly"
         self.swap.current(0)
         place(self.swap, h="", w=0.3, x=0.25, y=0.11)
@@ -161,18 +166,18 @@ class SettingsPage(tk.Frame):
         self.info = tk.Label(self.right, bg=s.BG2, fg=s.SEARCHBG)
         place(self.info, h=0.92, w=1, x=0, y=0.08)
         self.errors = tk.Label(self.right, text="", anchor="w", bg=s.BG2,
-                               fg=s.BUTTON_R, font=(s.NORMAL_FONT, 12, "bold"), padx=10)
+                               fg=s.BUTTON_R, font=(s.FONT2, 12, "bold"), padx=10)
         place(self.errors, h=0.08, w=1, x=0, y=0)
-        self.import_di = tk.Label(self.left, bg=s.BG2, font=(s.NORMAL_FONT, 11),
+        self.import_display = tk.Label(self.left, bg=s.BG2, font=(s.FONT2, 11),
                                   anchor="w", text="", padx=5)
-        place(self.import_di, h=0.035, w=0.9, x=0.02, y=0.365)
+        place(self.import_display, h=0.035, w=0.9, x=0.02, y=0.365)
         self.display_info()
 
     def display_info(self):
         load_info = tk.Label(self.info, text=en.SETT_DIS1, font=(
                           s.FONT1, 11), bg=s.BG2, fg=s.SEARCHBG, anchor="w")
         place(load_info, h=0.05, w=0.9, x=0.052, y=0)
-        self.loaded = tk.Label(self.info, text=s.DEFAULT_DB, font=(s.FONT1, 20, "bold"),
+        self.loaded = tk.Label(self.info, text=g.DEFAULT_DB, font=(s.FONT1, 20, "bold"),
                           bg=s.BG2, fg=s.SEARCHBG)
         place(self.loaded, h=0.08, w=0.9, x=0.052, y=0.04)
         basics = tk.Label(self.info)

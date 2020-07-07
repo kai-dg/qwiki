@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from peewee import *
 # APP STUFF
 TITLE = "Qwiki"
 #COLORS
@@ -16,30 +15,7 @@ TEXT2 = "#333332" # dark
 TEXT3 = "#1D1D1C" # darker
 #FONTS
 FONT1 = "Courier"
-NORMAL_FONT = "Arial"
+FONT2 = "Arial"
 #SIZES
 W_HEIGHT = 750
 W_WIDTH = 700
-# GLOBAL VARS
-TARGET = None
-IDX = 0
-PAGE_NAME = ""
-CONTENT = {} # idx: {header: content}
-WIKI_LIST = ["test1"]
-WIKI_DB_INFO = {}
-PAGE_TEMPLATE = {
-    "page": {
-        "name": "",
-        "notes": ""
-    },
-    "cont": {}, # cont format: {idx: {title: content}}
-    "page_obj": None
-}
-TAB = "    "
-MENU_BUTTONS = {} # For changing button colors
-# FILES
-JSON_NAME = "db_info.json"
-DEFAULT_DB = "ADD WIKI"
-#DB_FILE = ".data"
-DB_FILE = "Test.db"
-DB = SqliteDatabase(DB_FILE)

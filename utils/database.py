@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 from peewee import *
-import ui.settings as s
+import utils.globals as g
 import os
 import json
-if not os.path.isfile(s.JSON_NAME):
-    with open(s.JSON_NAME, "w") as f:
+if not os.path.isfile(g.JSON_NAME):
+    with open(g.JSON_NAME, "w") as f:
         template = {"active": "", "wikis": {}}
         json.dump(template, f)
 
+
 def read_json() -> dict:
-	with open(s.JSON_NAME, "r") as f:
+	with open(g.JSON_NAME, "r") as f:
 		return json.load(f)
 
 def write_json(data):
 	"""Data always needs to be modified from read_json()"""
-	with open(s.JSON_NAME, "w") as f:
+	with open(g.JSON_NAME, "w") as f:
 		json.dump(data, f)
 
 def create_profile(name, notes):

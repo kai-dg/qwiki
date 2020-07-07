@@ -7,11 +7,12 @@ import tkinter as tk
 import ui.settings as s
 from ui.tk_helper import place
 from ui.tk_helper import change_button_color
+import ui.language as en
 from utils.models import DPage
 from utils.models import DContent
 import utils.formatter as fm
 from utils.models import set_ctrl
-import ui.language as en
+import utils.globals as g
 
 
 def check_contents(data):
@@ -24,11 +25,16 @@ def check_contents(data):
 
 class AddPage(tk.Frame):
     def __init__(self, parent, button):
+        """This page tracks display info, and actual data format for db.
+        Vars:
+            self.info: Changable text visual
+            self.d_info: Display Information tracking
+        """
         tk.Frame.__init__(self, parent)
         change_button_color(button)
         self.content = tk.Frame(parent, bg=s.FG, padx=18, pady=18)
         place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
-        self.page_data = s.PAGE_TEMPLATE
+        self.page_data = g.PAGE_TEMPLATE
         self.d_info = []
         self.layout()
         self.labels()
@@ -53,39 +59,50 @@ class AddPage(tk.Frame):
             header = fm.format_header(data["header"])
             content = fm.format_content(data["content"])
             self.page_data["page"]["notes"] = notes
-            self.page_data["cont"][s.IDX] = {
+            self.page_data["cont"][g.IDX] = {
                 "title": header,
                 "cont": content
             }
-            if s.IDX == 0:
+            if g.IDX == 0:
                 self.d_info.append(f"{page}{notes}")
                 self.info["text"] = "".join(self.d_info)
             self.d_info.append(f"{header}{content}")
             self.info["text"] = "".join(self.d_info)
-            s.IDX += 1
+            g.IDX += 1
         else:
             self.errors["text"] = en.ERR_ADD2
 
     def clear_all(self):
         self.name.delete(0, "end")
         self.notes_entry.delete(0, "end")
+        self.title.delete(0, "end")
+        self.content_text.delete("1.0", tk.END)
         self.info["text"] = ""
-        self.page_data = s.PAGE_TEMPLATE
+        self.page_data["page"]["name"] = ""
+        self.page_data["page"]["notes"] = ""
+        self.page_data["cont"] = {}
         self.d_info = []
-        s.IDX = 0
+        g.IDX = 0
 
     def undo_one(self):
-        #TODO need to delete info page too
-        if self.d_info != []:
-            if s.IDX != 0:
-                del self.d_info[s.IDX]
-            else:
-                popped = self.d_info.pop()
-            self.info["text"] = "".join(self.d_info)
-            s.IDX -= 1
+        """Deletes the current content index `s.IDX`, removes one item
+        from end of `self.d_info`, -1 from `s.IDX`. Then refreshes text on 
+        info display.
+        """
+        print(g.IDX, len(self.d_info))
+        if g.IDX > 0:
+            del self.page_data["cont"][g.IDX-1]
+            popped = self.d_info.pop()
+            g.IDX -= 1
+        elif g.IDX == 0 and len(self.d_info) == 1:
+            self.page_data["page"]["name"] = ""
+            self.page_data["page"]["notes"] = ""
+            popped = self.d_info.pop()
+        self.info["text"] = "".join(self.d_info)
+
 
     def create_page(self):
-        """Executing Create Page button. Resets global variables."""
+        """Executing Create Page button."""
         Ctrl = set_ctrl()
         page = Ctrl.add_page(self.page_data["page"])
         self.page_data["page_obj"] = page["page"]
@@ -111,7 +128,7 @@ class AddPage(tk.Frame):
                              anchor="nw", padx=20, pady=20, justify="left")
         place(self.info, h=0.92, w=1, x=0, y=0.08)
         self.errors = tk.Label(self.right, text="", anchor="w", bg=s.BG2,
-                               fg=s.BUTTON_R, font=(s.NORMAL_FONT, 12, "bold"), padx=10)
+                               fg=s.BUTTON_R, font=(s.FONT2, 12, "bold"), padx=10)
         place(self.errors, h=0.08, w=1, x=0, y=0)
 
     def labels(self):
@@ -126,13 +143,13 @@ class AddPage(tk.Frame):
         place(content_title, h="", w=0.2, x=0, y=0.14)
 
     def entries(self):
-        self.name = tk.Entry(self.left, bg=s.SEARCHFG, fg=s.FG, font=(s.NORMAL_FONT, 12))
+        self.name = tk.Entry(self.left, bg=s.SEARCHFG, fg=s.FG, font=(s.FONT2, 12))
         place(self.name, h="", w=0.67, x=0.25, y=0)
-        self.notes_entry = tk.Entry(self.left, bg=s.SEARCHFG, fg=s.FG, font=(s.NORMAL_FONT, 12))
+        self.notes_entry = tk.Entry(self.left, bg=s.SEARCHFG, fg=s.FG, font=(s.FONT2, 12))
         place(self.notes_entry, h="", w=0.67, x=0.25, y=0.05)
-        self.title = tk.Entry(self.left, bg=s.SEARCHFG, fg=s.FG, font=(s.NORMAL_FONT, 12))
+        self.title = tk.Entry(self.left, bg=s.SEARCHFG, fg=s.FG, font=(s.FONT2, 12))
         place(self.title, h="", w=0.67, x=0.25, y=0.14)
-        self.content_text = tk.Text(self.left, bg=s.SEARCHBG, font=(s.NORMAL_FONT, 9),
+        self.content_text = tk.Text(self.left, bg=s.SEARCHBG, font=(s.FONT2, 9),
                                     fg=s.FG, padx=5, pady=5)
         place(self.content_text, h=0.35, w=0.98, x=0, y=0.20)
 

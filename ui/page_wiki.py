@@ -7,6 +7,7 @@ import ui.settings as s
 from utils.models import set_query
 import utils.formatter as fm
 import ui.language as en
+import utils.globals as g
 
 
 class WikiPage(tk.Frame):
@@ -14,10 +15,10 @@ class WikiPage(tk.Frame):
         self.parent = parent
         tk.Frame.__init__(self, parent)
         clear_colors()
-        s.TARGET = entry.title()
+        g.TARGET = entry.title()
         self.content = tk.Frame(parent, bg=s.FG, padx=10, pady=10)
         place(self.content, h=0.93, w=2, x=0.2, y=0.04, a="n")
-        self.Query = set_query(s.TARGET)
+        self.Query = set_query(g.TARGET)
         self.base = tk.Frame(self.content, bg=s.BG2, padx=25, pady=25)
         self.query_entry()
 
@@ -66,6 +67,9 @@ class WikiPage(tk.Frame):
         if len(q) == 0:
             self.not_found()
             s.TARGET = ""
+
+    def no_database(self):
+        pas
 
     def not_found(self):
         self.error = tk.Frame(self.parent, bg=s.FG)

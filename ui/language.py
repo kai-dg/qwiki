@@ -49,3 +49,10 @@ SETT_DIS1 = "Currently Loaded Wiki:"
 
 # Wiki Page (Search)
 WIKI_ERR1 = "Page not found."
+
+# Update Page
+UP_ERR_1 = "Search for a page, and then you can update it."
+
+# Confirmation Pages
+CONFIRM_1 = "Are you sure you want to delete"
+CONFIRM_ERR_1 = "Search for a page, and then you can delete it."

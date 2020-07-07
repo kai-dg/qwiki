@@ -2,6 +2,7 @@
 from peewee import *
 import tkinter as tk
 import ui.settings as s
+import utils.globals as g
 import utils.database as db
 from ui.tk_helper import place
 import ui.language as en
@@ -11,13 +12,8 @@ from ui.page_add import AddPage
 from ui.page_update import UpdatePage
 from ui.page_confirms import DelConfirmPage
 from ui.page_help import HelpPage
-from utils.models import models_db_swap
-s.WIKI_DB_INFO = db.read_json()
-s.DEFAULT_DB = s.WIKI_DB_INFO["active"] if s.WIKI_DB_INFO["active"] != "" else s.DEFAULT_DB
-s.DB_FILE = f"{s.DEFAULT_DB}.db"
-models_db_swap()
-s.WIKI_LIST = list(s.WIKI_DB_INFO["wikis"])
-s.WIKI_LIST = [""] if s.WIKI_LIST == [] else s.WIKI_LIST
+from utils.models import init_database
+init_database()
 
 
 class App():
@@ -31,9 +27,7 @@ class App():
         self.bottom_buttons()
         self.content_f()
         self.root.mainloop()
-
-    def button_color(self):
-        pass
+        g.DB.close()
 
     def replace(self, cls):
         """Controller for changing self.content frame"""
@@ -47,21 +41,21 @@ class App():
     def search_bar(self):
         frame_search = tk.Frame(self.frame, bg=s.SEARCHBG)
         place(frame_search, h=0.04, w=2, x=0.1, y=0, a="n")
-        self.searchlabel = tk.Label(frame_search, text=s.DEFAULT_DB, bg=s.SEARCHBG,
+        self.searchlabel = tk.Label(frame_search, text=g.DEFAULT_DB, bg=s.SEARCHBG,
                                      font=(s.FONT1, 9, "bold"), anchor="center")
         place(self.searchlabel, h=1, w=0.1, x=0.45, y=0)
-        self.searchbar = tk.Entry(frame_search, font=(s.NORMAL_FONT, 12), bg=s.SEARCHFG,
+        self.searchbar = tk.Entry(frame_search, font=(s.FONT2, 12), bg=s.SEARCHFG,
                                   fg=s.TEXT2)
         self.searchbar.bind("<Return>", (lambda event: self.replace(
                             WikiPage(self.frame, self.searchbar.get()))))
         place(self.searchbar, h=1, w=0.3, x=0.55, y=0)
-        searchbutton = tk.Button(frame_search, text=en.SEARCH_B1, font=(s.NORMAL_FONT, 9),
+        searchbutton = tk.Button(frame_search, text=en.SEARCH_B1, font=(s.FONT2, 9),
                                  bg=s.BUTTON_D, fg=s.TEXT1, activebackground=s.BUTTON_A,
                                  activeforeground=s.TEXT2,
                                  command=lambda: self.replace(WikiPage(self.frame,
                                  self.searchbar.get())))
         place(searchbutton, h=1, w=0.05, x=0.85, y=0)
-        search_by_tag = tk.Button(frame_search, text=en.SEARCH_B2, font=(s.NORMAL_FONT, 9),
+        search_by_tag = tk.Button(frame_search, text=en.SEARCH_B2, font=(s.FONT2, 9),
                                  bg=s.BUTTON_D, fg=s.TEXT1, activebackground=s.BUTTON_A,
                                  activeforeground=s.TEXT2)
         place(search_by_tag, h=1, w=0.05, x=0.90, y=0)
@@ -91,12 +85,9 @@ class App():
                                     bg=s.SEARCHBG, fg=s.TEXT3,
                                     command=lambda: self.replace(HelpPage(self.frame, "help")))
         place(self.help_wiki, h=1, w=0.2, x=0.8, y=0)
-        s.MENU_BUTTONS = {
+        g.MENU_BUTTONS = {
             "add": self.add_wiki,
             "update": self.update_wiki,
             "sett": self.sett_wiki,
             "help": self.help_wiki
         }
-
-if __name__ == "__main__":
-    pass
