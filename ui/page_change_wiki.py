@@ -18,11 +18,8 @@ from ui.tk_helper import change_button_color
 import ui.language as en
 import ui.settings as s
 import utils.globals as g
-import utils.database as db
-from utils.models import change_database
-from utils.models import make_tables
-from utils.models import rename_database
-from utils.models import delete_database
+import utils.database as jdb
+import utils.models as db
 
 
 def name_check(name):
@@ -51,8 +48,8 @@ class SettingsPage(tk.Frame):
     def add_wiki(self, name, notes):
         if name_check(name):
             res = name.capitalize()
-            db.create_profile(res, notes)
-            g.WIKI_DB_INFO = db.read_json()
+            jdb.create_profile(res, notes)
+            g.WIKI_DB_INFO = fdb.read_json()
             self.errors["text"] = f"{en.SETT_ADD1} {res}"
             g.DEFAULT_DB = res
             self.loaded["text"] = res
@@ -61,21 +58,58 @@ class SettingsPage(tk.Frame):
             self.swap["values"] = g.WIKI_LIST
             self.swap.set(res)
             self.status["text"] = res
-            db.change_profile(res)
-            change_database(res)
-            make_tables()
+            jdb.change_profile(res)
+            db.change_database(res)
+            db.make_tables()
         else:
             self.errors["text"] = en.SETT_ERR1
         self.name_entry.delete(0, "end")
         self.notes_entry.delete(0, "end")
 
-    def delete_wiki(self):
-        target = g.DEFAULT_DB
-        delete_database()
-        self.errors["text"] = f"{en.SETT_ERR2} {target}"
+    def set_combobox(self):
+        self.swap.set(g.DEFAULT_DB)
+
+    def set_loaded_display(self):
         self.loaded["text"] = g.DEFAULT_DB
         self.description["text"] = g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB]
+
+    def delete_wiki(self):
+        target = g.DEFAULT_DB
+        db.delete_database()
+        self.errors["text"] = f"{en.SETT_ERR2} {target}"
+        self.set_loaded_display()
         self.swap.config(value=g.WIKI_LIST)
+        self.set_combobox()
+
+    def load_wiki(self):
+        name = self.swap.get()
+        jdb.change_profile(name)
+        db.change_database(name)
+        db.init_database_info()
+        self.set_loaded_display()
+        self.errors["text"] = f"{en.SETT_ERR4} {name}"
+        self.set_combobox()
+
+    def update_wiki_name(self):
+        old = f"{g.DB_FILE}"
+        name = self.change_entry.get().title()
+        check = name_check(name)
+        if check:
+            filename = f"{name}.db"
+            db.rename_database(filename)
+            db.change_database(name)
+            jdb.update_profile_name(name)
+            g.DEFAULT_DB = name
+            db.init_database_info()
+            self.set_loaded_display()
+            self.errors["text"] = f"{en.SETT_ERR5} {old.replace('.db', '')} to {name}"
+        else:
+            self.errors["text"] = en.SETT_ERR1
+
+    def update_wiki_desc(self):
+        desc = self.change_entry.get()
+        jdb.update_profile_desc(desc)
+        self.set_loaded_display()
 
     def get_filepath(self):
         filename = askopenfilename()
@@ -118,7 +152,7 @@ class SettingsPage(tk.Frame):
         place(self.notes_entry, h="", w=0.3, x=0.25, y=0.05)
         self.swap = ttk.Combobox(self.left, value=g.WIKI_LIST)
         self.swap["state"] = "readonly"
-        self.swap.current(0)
+        self.set_combobox()
         place(self.swap, h="", w=0.3, x=0.25, y=0.11)
         self.change_entry = tk.Entry(self.left, bg=s.SEARCHFG)
         place(self.change_entry, h="", w=0.3, x=0.25, y=0.165)
@@ -131,13 +165,13 @@ class SettingsPage(tk.Frame):
                                self.notes_entry.get()))
         place(add_button, h="", w=0.3, x=0.59, y=0.005)
         swap_button = tk.Button(self.left, text=en.SETT_B2, bg=s.SEARCHBG,
-                                fg=s.TEXT3)
+                                fg=s.TEXT3, command=lambda: self.load_wiki())
         place(swap_button, h="", w=0.3, x=0.59, y=0.106)
         edit_name_button = tk.Button(self.left, text=en.SETT_B3, bg=s.SEARCHBG,
-                                  fg=s.TEXT3)
+                                  fg=s.TEXT3, command=lambda: self.update_wiki_name())
         place(edit_name_button, h="", w=0.18, x=0.59, y=0.16)
         edit_notes_button = tk.Button(self.left, text=en.SETT_B4, bg=s.SEARCHBG,
-                                      fg=s.TEXT3)
+                                      fg=s.TEXT3, command=lambda: self.update_wiki_desc())
         place(edit_notes_button, h="", w=0.18, x=0.79, y=0.16)
         import_select = tk.Button(self.left, text=en.SETT_B5, bg=s.SEARCHBG,
                                   fg=s.TEXT3, command=lambda: self.get_filepath())

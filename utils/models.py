@@ -77,11 +77,11 @@ def init_database_info():
     g.WIKI_LIST = list(g.WIKI_DB_INFO["wikis"])
     g.WIKI_LIST = [""] if g.WIKI_LIST == [] else g.WIKI_LIST
 
-def rename_database():
+def rename_database(filename):
     if not g.DB.is_closed():
         g.DB.close()
     try:
-        os.rename(g.RENAME_DB_TARGET, g.RENAME_DB_NEW)
+        os.rename(g.DB_FILE, filename)
     except:
         pass
 

@@ -32,5 +32,3 @@ PAGE_TEMPLATE = {
 }
 TAB = "    "
 MENU_BUTTONS = {} # ui/app.py -> App.bottom_buttons()
-DB_TARGET = ""
-DB_NEW = ""

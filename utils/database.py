@@ -35,12 +35,15 @@ def delete_profile(name):
 	del data["wikis"][name]
 	write_json(data)
 
-def update_profile(name, new, notes):
+def update_profile_name(new):
 	data = read_json()
-	if new:
-		temp = data["wikis"][name]
-		data["wikis"][new] = temp
-		del data["wikis"][name]
-	if notes:
-		data["wikis"][name] = notes
+	temp_notes = data["wikis"][g.DEFAULT_DB]
+	data["wikis"][new] = temp_notes
+	del data["wikis"][g.DEFAULT_DB]
 	write_json(data)
+	change_profile(new)
+
+def update_profile_desc(desc):
+	g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB] = desc
+	write_json(g.WIKI_DB_INFO)
+	g.WIKI_DB_INFO = read_json()

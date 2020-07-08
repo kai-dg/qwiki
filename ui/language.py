@@ -45,6 +45,8 @@ SETT_ADD1 = "Added new wiki:"
 SETT_ERR1 = "Please enter a 1 word name only."
 SETT_ERR2 = "Deleted wiki:"
 SETT_ERR3 = "Incorrect file type. Please choose a '.db' file."
+SETT_ERR4 = "Loaded wiki:"
+SETT_ERR5 = "Changed wiki's name"
 SETT_DIS1 = "Currently Loaded Wiki:"
 
 # Wiki Page (Search)
