@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""All db_info.json related functions"""
 from peewee import *
 import utils.globals as g
 from utils.models import make_tables
@@ -12,6 +13,7 @@ if not os.path.isfile(g.JSON_NAME):
 
 
 def read_json() -> dict:
+	"""Returns db_info.json"""
 	with open(g.JSON_NAME, "r") as f:
 		return json.load(f)
 

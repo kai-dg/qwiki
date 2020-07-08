@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+"""Entry point for Tkinter's app loop"""
 from peewee import *
 import tkinter as tk
 import ui.settings as s
 import utils.globals as g
-import utils.database as db
+import utils.json_database as jdb # Need this to prevent circular import
 from ui.tk_helper import place
 from ui.tk_helper import refresh_globals
 import ui.language as en
@@ -17,6 +18,10 @@ from utils.models import init_database_info
 
 
 class App():
+    """Every button on the static interface should use self.replace() to
+    change frames. Anything with static_ means any widget created in those functions
+    will stay on the screen for the entire time.
+    """
     def __init__(self):
         self.root = tk.Tk()
         self.root.title(s.TITLE)
@@ -24,9 +29,9 @@ class App():
         self.frame = tk.Frame(self.root, bg=s.FG)
         self.frame.place(relheight=1, relwidth=1, relx=0.5, rely=0.5, anchor="c")
         self.current_frame = None
-        self.search_bar()
-        self.bottom_buttons()
-        self.content_f()
+        self.static_searchbar()
+        self.static_bottom_buttons()
+        self.initial_frame()
         init_database_info()
         self.root.mainloop()
         g.DB.close()
@@ -40,14 +45,14 @@ class App():
         self.current_frame = cls
         self.content.destroy()
 
-    def content_f(self):
+    def initial_frame(self):
         """Initial screen when starting the app"""
         self.content = tk.Frame(self.frame, bg=s.FG)
         self.content.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04, anchor="n")
         self.replace(HelpPage(self.frame, "help"))
 
-    def search_bar(self):
-        """Everything in the top section."""
+    def static_searchbar(self):
+        """Everything in the top section (search bar and buttons)."""
         frame_search = tk.Frame(self.frame, bg=s.SEARCHBG)
         place(frame_search, h=0.04, w=2, x=0.1, y=0, a="n")
         self.searchlabel = tk.Label(frame_search, text=g.DEFAULT_DB, bg=s.SEARCHBG,
@@ -69,8 +74,8 @@ class App():
                                  activeforeground=s.TEXT2)
         place(search_by_tag, h=1, w=0.05, x=0.90, y=0)
 
-    def bottom_buttons(self):
-        """Everything on the bottom section."""
+    def static_bottom_buttons(self):
+        """Everything on the bottom section (the row of buttons)."""
         self.frame_editor = tk.Frame(self.frame, bg="red")
         place(self.frame_editor, h=0.03, w=1, x=0.5, y=1, a="s")
         self.add_wiki = tk.Button(self.frame_editor, text=en.BOTT_B1, font=(s.FONT1, 9,
@@ -96,6 +101,7 @@ class App():
                                    command=lambda: [self.replace(HelpPage(self.frame,
                                    "help")), refresh_globals()])
         place(self.help_wiki, h=1, w=0.2, x=0.8, y=0)
+        # Globals for changing button colors when pressed
         g.MENU_BUTTONS = {
             "add": self.add_wiki,
             "update": self.update_wiki,

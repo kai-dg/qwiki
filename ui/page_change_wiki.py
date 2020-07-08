@@ -18,18 +18,15 @@ from ui.tk_helper import change_button_color
 import ui.language as en
 import ui.settings as s
 import utils.globals as g
-import utils.database as jdb
+import utils.json_database as jdb
 import utils.models as db
 
 
-def name_check(name):
+def name_check(name:str) -> bool:
+    """Checks if name for database file is one word only."""
     if len(name.split()) != 1:
         return False
     return True
-
-def format_tag_info() -> str:
-    """Formats current loaded wiki's tag information"""
-    pass
 
 class SettingsPage(tk.Frame):
     def __init__(self, parent, button, status):
@@ -45,11 +42,24 @@ class SettingsPage(tk.Frame):
         self.entries()
         self.buttons()
 
+    def set_combobox(self):
+        """Sets the dropbox menu on Load: label"""
+        self.swap.set(g.DEFAULT_DB)
+
+    def set_loaded_display(self):
+        """Refreshes searchbar's DB status and current loaded on right side 
+        info display
+        """
+        self.loaded["text"] = g.DEFAULT_DB
+        self.description["text"] = g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB]
+        self.status["text"] = g.DEFAULT_DB
+
     def add_wiki(self, name, notes):
+        """Add Wiki's button function"""
         if name_check(name):
             res = name.capitalize()
             jdb.create_profile(res, notes)
-            g.WIKI_DB_INFO = fdb.read_json()
+            g.WIKI_DB_INFO = jdb.read_json()
             self.errors["text"] = f"{en.SETT_ADD1} {res}"
             g.DEFAULT_DB = res
             self.loaded["text"] = res
@@ -66,14 +76,8 @@ class SettingsPage(tk.Frame):
         self.name_entry.delete(0, "end")
         self.notes_entry.delete(0, "end")
 
-    def set_combobox(self):
-        self.swap.set(g.DEFAULT_DB)
-
-    def set_loaded_display(self):
-        self.loaded["text"] = g.DEFAULT_DB
-        self.description["text"] = g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB]
-
     def delete_wiki(self):
+        """Delete Wiki button's function"""
         target = g.DEFAULT_DB
         db.delete_database()
         self.errors["text"] = f"{en.SETT_ERR2} {target}"
@@ -82,6 +86,7 @@ class SettingsPage(tk.Frame):
         self.set_combobox()
 
     def load_wiki(self):
+        """Load button's function"""
         name = self.swap.get()
         jdb.change_profile(name)
         db.change_database(name)
@@ -91,6 +96,7 @@ class SettingsPage(tk.Frame):
         self.set_combobox()
 
     def update_wiki_name(self):
+        """Edit label: Name button's function"""
         old = f"{g.DB_FILE}"
         name = self.change_entry.get().title()
         check = name_check(name)
@@ -107,18 +113,20 @@ class SettingsPage(tk.Frame):
             self.errors["text"] = en.SETT_ERR1
 
     def update_wiki_desc(self):
+        """Edit label: Desc. button's function"""
         desc = self.change_entry.get()
         jdb.update_profile_desc(desc)
         self.set_loaded_display()
 
     def get_filepath(self):
+        """Import label: Browse... button's function"""
         filename = askopenfilename()
         if filename == "":
             pass
         elif ".db" not in os.path.basename(filename):
             self.import_display.config(fg=s.BUTTON_R)
             self.import_display["text"] = en.SETT_ERR3
-        # Test if actual db
+            # Test if actual db
         else:
             self.filepath = filename
             self.import_display.config(fg=s.SEARCHBG)

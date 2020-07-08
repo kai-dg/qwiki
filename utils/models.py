@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Database stuff"""
 from peewee import *
-import utils.database as db
+import utils.json_database as jdb
 import utils.globals as g
 from utils.controller import ModelCtrl
 from utils.controller import Query
@@ -71,7 +71,7 @@ def set_query(name:str):
     return q
     
 def init_database_info():
-    g.WIKI_DB_INFO = db.read_json()
+    g.WIKI_DB_INFO = jdb.read_json()
     g.DEFAULT_DB = g.WIKI_DB_INFO["active"]
     g.DB_FILE = f"{g.DEFAULT_DB}.db"
     g.WIKI_LIST = list(g.WIKI_DB_INFO["wikis"])
@@ -94,7 +94,7 @@ def delete_database():
         g.DB.close()
     if os.path.isfile(g.DB_FILE):
         os.remove(g.DB_FILE)
-    db.delete_profile(g.DEFAULT_DB)
+    jdb.delete_profile(g.DEFAULT_DB)
     if g.WIKI_LIST != []:
         for name in g.WIKI_LIST:
             if name != g.DEFAULT_DB:
@@ -105,5 +105,5 @@ def delete_database():
         g.DEFAULT_DB = "Default"
         change_database("Default")
         make_tables()
-    db.change_profile(name)
+    jdb.change_profile(name)
     init_database_info()

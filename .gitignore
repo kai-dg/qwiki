@@ -7,5 +7,5 @@ build/*
 qwiki_app.spec
 utils/db_info.json
 db_info.json
-Default.db
+*.db
 test.py

@@ -73,6 +73,7 @@ class AddPage(tk.Frame):
             self.errors["text"] = en.ERR_ADD2
 
     def clear_all(self):
+        """Clears all entry inputs on this page."""
         self.name.delete(0, "end")
         self.notes_entry.delete(0, "end")
         self.title.delete(0, "end")
@@ -110,7 +111,8 @@ class AddPage(tk.Frame):
         self.errors["text"] = page["message"]
         self.clear_all()
 
-    def get_inputs(self):
+    def get_inputs(self) -> dict:
+        """Gets all inputs from this page."""
         name = self.name.get()
         content = self.content_text.get("1.0", tk.END)
         header = self.title.get()
