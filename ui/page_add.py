@@ -24,17 +24,12 @@ def check_contents(data):
 
 class AddPage(tk.Frame):
     def __init__(self, parent, button):
-        """This page tracks display info, and actual data format for db.
-        Vars:
-            self.info: Changable text visual
-            self.d_info: Display Information tracking
-        """
         tk.Frame.__init__(self, parent)
         change_button_color(button)
         self.content = tk.Frame(parent, bg=s.FG, padx=18, pady=18)
         place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.page_data = g.PAGE_TEMPLATE
-        self.d_info = []
+        self.d_info = [] # display() -> add_content() tracking
         self.layout()
         self.labels()
         self.entries()

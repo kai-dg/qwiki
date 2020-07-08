@@ -45,7 +45,7 @@ class DelPage(tk.Frame):
 
     def no_selection(self):
         message_label = tk.Label(self.content, text=en.CONFIRM_ERR_1, bg=s.FG,
-                                 fg=s.SEARCHFG, font=(s.FONT2, 14, "bold"))
+                                 fg=s.SEARCHFG, font=(s.FONT2, 20, "bold"))
         place(message_label, h=1, w=1, x=0, y=0)
 
     def back(self):

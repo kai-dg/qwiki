@@ -78,26 +78,26 @@ class App():
         """Everything on the bottom section (the row of buttons)."""
         self.frame_editor = tk.Frame(self.frame, bg="red")
         place(self.frame_editor, h=0.03, w=1, x=0.5, y=1, a="s")
-        self.add_wiki = tk.Button(self.frame_editor, text=en.BOTT_B1, font=(s.FONT1, 9,
+        self.add_wiki = tk.Button(self.frame_editor, text=en.BOTT_B1, font=(s.FONT1, 10,
                                   "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
                                   command=lambda: self.replace(AddPage(self.frame, "add")))
         place(self.add_wiki, h=1, w=0.2, x=0, y=0)
         self.update_wiki = tk.Button(self.frame_editor, text=en.BOTT_B2, font=(s.FONT1,
-                                     9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
+                                     10, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
                                      command=lambda: self.replace(UpdatePage(self.frame, "update")))
         place(self.update_wiki, h=1, w=0.2, x=0.2, y=0)
         self.delete_wiki = tk.Button(self.frame_editor, text=en.BOTT_B3, font=(
-                                     s.FONT1, 9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
+                                     s.FONT1, 10, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
                                      command=lambda: self.replace(DelPage(
                                      self.frame, "del")))
         place(self.delete_wiki, h=1, w=0.2, x=0.4, y=0)
         self.sett_wiki = tk.Button(self.frame_editor, text=en.BOTT_B4, font=(
-                                   s.FONT1, 9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
+                                   s.FONT1, 10, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
                                     command=lambda: [self.replace(SettingsPage(self.frame, "sett",
                                     self.searchlabel)), refresh_globals()])
         place(self.sett_wiki, h=1, w=0.2, x=0.6, y=0)
         self.help_wiki = tk.Button(self.frame_editor, text=en.BOTT_B5, font=(s.FONT1,
-                                   9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
+                                   10, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
                                    command=lambda: [self.replace(HelpPage(self.frame,
                                    "help")), refresh_globals()])
         place(self.help_wiki, h=1, w=0.2, x=0.8, y=0)

@@ -22,8 +22,23 @@ class WikiPage(tk.Frame):
         place(self.base, h=1, w=0.5, x=0.402, y=0)
         self.query_entry()
 
+    def query_entry(self):
+        """Implement fuzzy finder here. search -> query -> suggestions -> not_found"""
+        query = set_query(g.TARGET)
+        q = query.full_page_match()
+        if len(q) == 1:
+            g.TARGET_PAGE = q[0]
+            self.draw_query(query)
+        else:
+            q = query.fuzzy_page_match()
+            self.suggestions_page(q)
+        if len(q) == 0:
+            self.not_found()
+            s.TARGET = ""
+
     def draw_query(self, query):
         cont = query.page_content()
+        g.TARGET_PAGE_CONT = cont
         cont_sects = {i: tk.Text for i in range(len(cont)*2)}
         row_amt = ((len(cont)*2) + 2)
         for r in range(row_amt):
@@ -54,7 +69,7 @@ class WikiPage(tk.Frame):
             ctitle.grid(row=row_idx, sticky="ewns", rowspan=1)
             # bind click to changing font color
             content = cont_sects[sect_idx+1](self.base, relief="flat", wrap="word", bg=s.BG2,
-                              padx=18, pady=10,  highlightbackground=s.SEARCHBG,
+                              padx=24, pady=10,  highlightbackground=s.SEARCHBG,
                               fg=s.SEARCHBG, highlightthickness=1, height=5,
                               highlightcolor=s.SEARCHFG, font=(s.FONT2, 11))
             content.insert(tk.INSERT, c.content.rstrip())
@@ -64,28 +79,6 @@ class WikiPage(tk.Frame):
             content.grid(row=(row_idx+1), sticky="ewns", rowspan=1)
             row_idx += 2
             sect_idx += 2
-
-    def draw_query2(self, query):
-        cont = query.page_content()
-        sections = {i: tk.Label for i in range(len(cont)*2)}
-        ptitle = fm.format_title(query.page_obj.name)
-        all_page = f"{ptitle}{query.page_obj.notes}"
-        title = tk.Label(self.base, text=ptitle.rstrip(), font=(s.FONT1, 22, "bold"),
-                         bg=s.BG2, fg=s.SEARCHBG, justify="left")
-        title.grid(row=1, sticky="w", rowspan=1)
-        notes = tk.Label(self.base, text=query.page_obj.notes, font=(s.FONT1, 12), bg=s.BG2,
-                         fg=s.SEARCHBG, justify="left")
-        notes.grid(row=2, sticky="w", rowspan=1, padx=10)
-        idx = 0
-        for c in cont:
-            temp = f"{c.title}{c.content}"
-            ctitle = sections[idx](self.base, text=c.title.rstrip(), justify="left", bg=s.BG2,
-                                   fg=s.SEARCHBG, font=(s.FONT1, 17, "bold"))
-            ctitle.grid(row=(idx+3), columnspan=1, sticky="w")
-            ccontent = sections[idx+1](self.base, text=c.content, justify="left", bg=s.BG2,
-                                       fg=s.SEARCHBG, font=(s.FONT1, 12))
-            ccontent.grid(row=(idx+4), columnspan=1, sticky="w")
-            idx += 2
 
     def suggestions_page(self, q_list):
         sections = {i: tk.Label for i in range(len(q_list)*2)}
@@ -98,25 +91,13 @@ class WikiPage(tk.Frame):
             qnotes.grid(row=(idx+2), columnspan=1, sticky="w")
             idx += 2
 
-    def query_entry(self):
-        """Implement fuzzy finder here. search -> query -> suggestions -> not_found"""
-        query = set_query(g.TARGET)
-        q = query.full_page_match()
-        if len(q) == 1:
-            g.TARGET_PAGE = q[0]
-            self.draw_query(query)
-        else:
-            q = query.fuzzy_page_match()
-            self.suggestions_page(q)
-        if len(q) == 0:
-            self.not_found()
-            s.TARGET = ""
-
     def no_database(self):
-        pas
+        pass
 
     def not_found(self):
         self.error = tk.Frame(self.parent, bg=s.FG)
-        self.error.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04, anchor="n")
-        message = tk.Label(self.error, text=en.WIKI_ERR1)
+        self.error.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04,
+                         anchor="n")
+        message = tk.Label(self.error, text=en.WIKI_ERR1, font=(s.FONT2, 20,
+                           "bold"), bg=s.FG, fg=s.SEARCHFG)
         place(message, h="", w=0.3, x=0.35, y=0.45)

@@ -2,6 +2,7 @@
 """All db_info.json related functions"""
 from peewee import *
 import utils.globals as g
+from utils.images import initial_base_folder
 from utils.models import make_tables
 import os
 import json
@@ -10,6 +11,7 @@ if not os.path.isfile(g.JSON_NAME):
         template = g.JSON_TEMPLATE
         json.dump(template, f)
         make_tables()
+        initial_base_folder()
 
 
 def read_json() -> dict:

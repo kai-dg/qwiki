@@ -6,7 +6,7 @@ DB = SqliteDatabase(DB_FILE)
 DBP = DatabaseProxy()
 DBP.initialize(DB) # Database connects when models.py gets imported from database.py
 DEFAULT_DB = "Default" # Display name on screen
-# FILES
+# FILES/FOLDERS
 JSON_NAME = "db_info.json"
 JSON_TEMPLATE = {
 	"active": "Default",
@@ -14,9 +14,11 @@ JSON_TEMPLATE = {
 		"Default": "Change my name and description"
 	}
 }
+BASE_IMG_FOLDER = "images"
 # GLOBAL VARS
 TARGET = "" # Page name holder
 TARGET_PAGE = None # Page object holder
+TARGET_PAGE_CONT = None # Page's content object holder
 IDX = 0 # Content.idx tracker
 PAGE_NAME = ""
 CONTENT = {} # idx: {header: content}

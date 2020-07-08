@@ -54,6 +54,8 @@ WIKI_ERR1 = "Page not found."
 
 # Update Page
 UP_ERR_1 = "Search for a page, and then you can update it."
+UP_B1 = "Save"
+UP_B2 = "Cancel"
 
 # Confirmation Pages
 CONFIRM_1 = "Are you sure you want to delete"

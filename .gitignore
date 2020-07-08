@@ -9,3 +9,4 @@ utils/db_info.json
 db_info.json
 *.db
 test.py
+images/*
