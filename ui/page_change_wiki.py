@@ -21,6 +21,8 @@ import utils.globals as g
 import utils.database as db
 from utils.models import change_database
 from utils.models import make_tables
+from utils.models import rename_database
+from utils.models import delete_database
 
 
 def name_check(name):
@@ -30,10 +32,6 @@ def name_check(name):
 
 def format_tag_info() -> str:
     """Formats current loaded wiki's tag information"""
-    pass
-
-def format_db_info() -> str:
-    """Formats g.WIKI_DB_INFO"""
     pass
 
 class SettingsPage(tk.Frame):
@@ -58,6 +56,7 @@ class SettingsPage(tk.Frame):
             self.errors["text"] = f"{en.SETT_ADD1} {res}"
             g.DEFAULT_DB = res
             self.loaded["text"] = res
+            self.description["text"] = notes
             g.WIKI_LIST.append(res)
             self.swap["values"] = g.WIKI_LIST
             self.swap.set(res)
@@ -70,12 +69,13 @@ class SettingsPage(tk.Frame):
         self.name_entry.delete(0, "end")
         self.notes_entry.delete(0, "end")
 
-    def delete_wiki(self, name):
-        res = f"{name}"
-        if g.WIKI_DB_INFO["wikis"].get(res, "") != "":
-            db.delete_profile(res)
-        else:
-            self.errors["text"] = f"{en.SETT_ERR2} {name}."
+    def delete_wiki(self):
+        target = g.DEFAULT_DB
+        delete_database()
+        self.errors["text"] = f"{en.SETT_ERR2} {target}"
+        self.loaded["text"] = g.DEFAULT_DB
+        self.description["text"] = g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB]
+        self.swap.config(value=g.WIKI_LIST)
 
     def get_filepath(self):
         filename = askopenfilename()
@@ -149,7 +149,7 @@ class SettingsPage(tk.Frame):
                                         fg=s.TEXT3)
         place(self.add_tag_button, h="", w=0.3, x=0.59, y=0.215)
         del_button = tk.Button(self.left, text=en.SETT_B8, bg=s.BUTTON_R,
-                               fg=s.TEXT3)
+                               fg=s.TEXT3, command=lambda: self.delete_wiki())
         place(del_button, h="", w=0.2, x=0.79, y=0.96)
 
     def display(self):
@@ -169,9 +169,11 @@ class SettingsPage(tk.Frame):
                           s.FONT1, 11), bg=s.BG2, fg=s.SEARCHBG, anchor="w")
         place(load_info, h=0.05, w=0.9, x=0.052, y=0)
         self.loaded = tk.Label(self.info, text=g.DEFAULT_DB, font=(s.FONT1, 20, "bold"),
-                          bg=s.BG2, fg=s.SEARCHBG)
+                          bg=s.BG2, fg=s.SEARCHBG, anchor="w")
         place(self.loaded, h=0.08, w=0.9, x=0.052, y=0.04)
-        basics = tk.Label(self.info)
+        self.description = tk.Label(self.info, text=g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB],
+                                    font=(s.FONT1, 11), anchor="w", bg=s.BG2, fg=s.SEARCHBG)
+        place(self.description, h=0.04, w=0.9, x=0.052, y=0.1)
 
     def layout(self):
         """All partitions are relative to self.content"""

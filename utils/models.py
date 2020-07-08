@@ -49,7 +49,8 @@ class Relations(BaseModel):
 def change_database(name):
     """Changes current database to `name`"""
     g.DB_FILE = f"{name}.db"
-    g.DB.close()
+    if not g.DB.is_closed():
+        g.DB.close()
     g.DB = SqliteDatabase(g.DB_FILE)
     g.DB.connect()
     g.DBP.initialize(g.DB)
@@ -75,3 +76,34 @@ def init_database_info():
     g.DB_FILE = f"{g.DEFAULT_DB}.db"
     g.WIKI_LIST = list(g.WIKI_DB_INFO["wikis"])
     g.WIKI_LIST = [""] if g.WIKI_LIST == [] else g.WIKI_LIST
+
+def rename_database():
+    if not g.DB.is_closed():
+        g.DB.close()
+    try:
+        os.rename(g.RENAME_DB_TARGET, g.RENAME_DB_NEW)
+    except:
+        pass
+
+def delete_database():
+    """Close connection, delete file, check json if wiki list is empty,
+    if empty, recreate default database, else switch to next db in ['wiki'],
+    rename globals to newly switched db
+    """
+    if not g.DB.is_closed():
+        g.DB.close()
+    if os.path.isfile(g.DB_FILE):
+        os.remove(g.DB_FILE)
+    db.delete_profile(g.DEFAULT_DB)
+    if g.WIKI_LIST != []:
+        for name in g.WIKI_LIST:
+            if name != g.DEFAULT_DB:
+                g.DEFAULT_DB = name
+                change_database(name)
+                break
+    else:
+        g.DEFAULT_DB = "Default"
+        change_database("Default")
+        make_tables()
+    db.change_profile(name)
+    init_database_info()

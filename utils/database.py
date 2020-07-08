@@ -31,7 +31,9 @@ def change_profile(name):
 	write_json(data)
 
 def delete_profile(name):
+	data = read_json()
 	del data["wikis"][name]
+	write_json(data)
 
 def update_profile(name, new, notes):
 	data = read_json()

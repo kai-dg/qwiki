@@ -43,7 +43,7 @@ LAB_SETT5 = "Tags:"
 LAB_SETT6 = "Import:"
 SETT_ADD1 = "Added new wiki:"
 SETT_ERR1 = "Please enter a 1 word name only."
-SETT_ERR2 = "Could not find the wiki:"
+SETT_ERR2 = "Deleted wiki:"
 SETT_ERR3 = "Incorrect file type. Please choose a '.db' file."
 SETT_DIS1 = "Currently Loaded Wiki:"
 

@@ -20,7 +20,7 @@ TARGET_PAGE = None # Page object holder
 IDX = 0 # Content.idx tracker
 PAGE_NAME = ""
 CONTENT = {} # idx: {header: content}
-WIKI_LIST = ["test1"]
+WIKI_LIST = []
 WIKI_DB_INFO = {}
 PAGE_TEMPLATE = {
     "page": {
@@ -32,3 +32,5 @@ PAGE_TEMPLATE = {
 }
 TAB = "    "
 MENU_BUTTONS = {} # ui/app.py -> App.bottom_buttons()
+DB_TARGET = ""
+DB_NEW = ""
