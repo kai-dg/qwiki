@@ -106,7 +106,7 @@ class UpdatePage(tk.Frame):
         """
         #s_title = self.cont_sects[idx]["text"].get("1.0", tk.END)
         # title -> content -> repeat order
-        is_title = False
+        is_title = True
         for sect in self.cont_sects.values():
             oldstring = sect["text"].get("1.0", tk.END)
             sect["text"].update()
@@ -115,10 +115,12 @@ class UpdatePage(tk.Frame):
                 if oldstring != sect["model"].title:
                     m_update = sect["model"].update(title=newstring)
                     m_update.execute()
+                    is_title = False
             else:
                 if oldstring != sect["model"].content:
                     m_update = sect["model"].update(content=newstring)
                     m_update.execute()
+                    is_title = True
         self.title.update()
         self.notes.update()
 
