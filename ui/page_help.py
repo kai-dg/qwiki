@@ -22,12 +22,12 @@ class HelpPage(tk.Frame):
         place(show_button, h="", w=0.3, x=0.35, y=0.55)
 
     def show_more(self):
+        pass
+
+    def button_info(self):
         tri1 = tk.Canvas(self.content, bg=s.FG, highlightthickness=0)
         tri1.create_polygon((0, 70, 35, 0, 70, 70), fill=s.SEARCHBG)
-        name_help = tk.Label(self.content, bg=s.FG, fg=s.SEARCHFG, text=en.NAME_HELP,
-                              font=(s.FONT1, 12, "bold"))
-        place(tri1, h=0.22, w=0.12, x=0.04, y=0)
-        place(name_help, h=0.07, w=0.18, x=0.5, y=0.05)
+        place(tri1, h=0.22, w=0.3, x=0.04, y=0)
 
         tri3 = tk.Canvas(self.content, bg=s.FG, highlightthickness=0)
         tri3.create_polygon((0, 70, 35, 0, 70, 70), fill=s.SEARCHBG)

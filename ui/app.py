@@ -11,7 +11,7 @@ from ui.page_wiki import WikiPage
 from ui.page_change_wiki import SettingsPage
 from ui.page_add import AddPage
 from ui.page_update import UpdatePage
-from ui.page_confirms import DelConfirmPage
+from ui.page_delete import DelPage
 from ui.page_help import HelpPage
 from utils.models import init_database_info
 
@@ -23,6 +23,7 @@ class App():
         self.root.geometry(f"{s.W_HEIGHT}x{s.W_WIDTH}")
         self.frame = tk.Frame(self.root, bg=s.FG)
         self.frame.place(relheight=1, relwidth=1, relx=0.5, rely=0.5, anchor="c")
+        self.current_frame = None
         self.search_bar()
         self.bottom_buttons()
         self.content_f()
@@ -31,7 +32,12 @@ class App():
         g.DB.close()
 
     def replace(self, cls):
-        """Controller for changing self.content frame"""
+        """Controller for changing self.content frame. Deletes current frame
+        to wipe the non init tk objects from that page.
+        """
+        if self.current_frame:
+            self.current_frame = None
+        self.current_frame = cls
         self.content.destroy()
 
     def content_f(self):
@@ -48,7 +54,7 @@ class App():
                                      font=(s.FONT1, 9, "bold"), anchor="center")
         place(self.searchlabel, h=1, w=0.1, x=0.45, y=0)
         self.searchbar = tk.Entry(frame_search, font=(s.FONT2, 12), bg=s.SEARCHFG,
-                                  fg=s.TEXT2)
+                                  fg=s.TEXT2, borderwidth=8, relief="flat")
         self.searchbar.bind("<Return>", (lambda event: self.replace(
                             WikiPage(self.frame, self.searchbar.get()))))
         place(self.searchbar, h=1, w=0.3, x=0.55, y=0)
@@ -77,8 +83,8 @@ class App():
         place(self.update_wiki, h=1, w=0.2, x=0.2, y=0)
         self.delete_wiki = tk.Button(self.frame_editor, text=en.BOTT_B3, font=(
                                      s.FONT1, 9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
-                                     command=lambda: self.replace(DelConfirmPage(
-                                     self.frame)))
+                                     command=lambda: self.replace(DelPage(
+                                     self.frame, "del")))
         place(self.delete_wiki, h=1, w=0.2, x=0.4, y=0)
         self.sett_wiki = tk.Button(self.frame_editor, text=en.BOTT_B4, font=(
                                    s.FONT1, 9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
@@ -94,5 +100,6 @@ class App():
             "add": self.add_wiki,
             "update": self.update_wiki,
             "sett": self.sett_wiki,
-            "help": self.help_wiki
+            "help": self.help_wiki,
+            "del": self.delete_wiki
         }

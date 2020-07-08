@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import tkinter as tk
 from ui.tk_helper import place
+from ui.tk_helper import change_button_color
 import ui.settings as s
 import utils.formatter as fm
 import ui.language as en
@@ -8,8 +9,9 @@ import utils.globals as g
 from utils.models import set_query
 
 
-class DelConfirmPage(tk.Frame):
-    def __init__(self, parent):
+class DelPage(tk.Frame):
+    def __init__(self, parent, button):
+        change_button_color(button)
         tk.Frame.__init__(self, parent)
         self.content = tk.Frame(parent, bg=s.FG, padx=18, pady=18)
         place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")

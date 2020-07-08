@@ -12,7 +12,7 @@ BOTT_B5 = "Help"
 WELCOME = """Thanks for using Qwiki"""
 START_HELP = "Wiki Settings"
 SEARCH_HELP = "Searchbar"
-NAME_HELP = "Current Wiki"
+NAME_HELP = "Current Wiki:"
 HELP_B1 = "Click for UI info"
 
 # Add Page

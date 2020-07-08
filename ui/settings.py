@@ -18,4 +18,4 @@ FONT1 = "Courier"
 FONT2 = "Arial"
 #SIZES
 W_HEIGHT = 750
-W_WIDTH = 700
+W_WIDTH = 800

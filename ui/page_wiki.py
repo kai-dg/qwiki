@@ -18,10 +18,54 @@ class WikiPage(tk.Frame):
         g.TARGET = entry.title().rstrip()
         self.content = tk.Frame(parent, bg=s.FG, padx=10, pady=10)
         place(self.content, h=0.93, w=2, x=0.2, y=0.04, a="n")
-        self.base = tk.Frame(self.content, bg=s.BG2, padx=25, pady=25)
+        self.base = tk.Frame(self.content, bg=s.FG, padx=25, pady=25)
+        place(self.base, h=1, w=0.5, x=0.402, y=0)
         self.query_entry()
 
     def draw_query(self, query):
+        cont = query.page_content()
+        cont_sects = {i: tk.Text for i in range(len(cont)*2)}
+        row_amt = ((len(cont)*2) + 2)
+        for r in range(row_amt):
+            self.base.grid_rowconfigure(r, weight=0)
+        self.base.grid_columnconfigure(0, weight=1)
+        title = tk.Text(self.base, relief="flat", wrap="word", bg=s.BG2, padx=15,
+                        pady=10, fg=s.SEARCHBG, highlightthickness=0, height=1,
+                        font=(s.FONT2, 25, "bold"))
+        title.insert(tk.INSERT, g.TARGET_PAGE.name.rstrip())
+        title.config(state="disabled")
+        title.grid(row=0, sticky="ewn", rowspan=1)
+        notes = tk.Text(self.base, relief="flat", bg=s.BG2, padx=25,
+                        pady=10, fg=s.SEARCHBG, highlightthickness=0, height=1,
+                        font=(s.FONT2, 12, "italic"))
+        notes.insert(tk.INSERT, g.TARGET_PAGE.notes.rstrip())
+        new_height = int(round(float(notes.index(tk.END))))
+        notes.config(height=new_height)
+        notes.config(state="disabled")
+        notes.grid(row=1, sticky="ewns", rowspan=1)
+        row_idx = 2
+        sect_idx = 0
+        for c in cont:
+            ctitle = cont_sects[sect_idx](self.base, relief="flat", wrap="word", bg=s.BG2,
+                             padx=15, pady=10, highlightthickness=0, height=1,
+                             fg=s.SEARCHBG, font=(s.FONT2, 15, "bold"))    
+            ctitle.insert(tk.INSERT, c.title)
+            ctitle.config(state="disabled")
+            ctitle.grid(row=row_idx, sticky="ewns", rowspan=1)
+            # bind click to changing font color
+            content = cont_sects[sect_idx+1](self.base, relief="flat", wrap="word", bg=s.BG2,
+                              padx=18, pady=10,  highlightbackground=s.SEARCHBG,
+                              fg=s.SEARCHBG, highlightthickness=1, height=5,
+                              highlightcolor=s.SEARCHFG, font=(s.FONT2, 11))
+            content.insert(tk.INSERT, c.content.rstrip())
+            new_height = int(round(float(content.index(tk.END))))
+            content.config(height=new_height)
+            content.config(state="disabled")
+            content.grid(row=(row_idx+1), sticky="ewns", rowspan=1)
+            row_idx += 2
+            sect_idx += 2
+
+    def draw_query2(self, query):
         cont = query.page_content()
         sections = {i: tk.Label for i in range(len(cont)*2)}
         ptitle = fm.format_title(query.page_obj.name)
@@ -58,10 +102,9 @@ class WikiPage(tk.Frame):
         """Implement fuzzy finder here. search -> query -> suggestions -> not_found"""
         query = set_query(g.TARGET)
         q = query.full_page_match()
-        place(self.base, h=1, w=0.5, x=0.402, y=0)
         if len(q) == 1:
-            self.draw_query(query)
             g.TARGET_PAGE = q[0]
+            self.draw_query(query)
         else:
             q = query.fuzzy_page_match()
             self.suggestions_page(q)

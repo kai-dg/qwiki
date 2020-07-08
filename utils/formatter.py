@@ -25,11 +25,11 @@ def format_content(content:str) -> str:
     splitted = content.rstrip().split("\n")
     for i in splitted:
         if i[0] != " " and i[0] != "\t":
-            res += f"{g.TAB}- {i.capitalize()}\n"
+            res += f"- {i.capitalize()}\n"
         else:
             m = re.search(r"[a-zA-Z]", i)
             first = i[m.start()]
             new = i.replace(i[m.start()], i[m.start()].upper(), 1)
-            res += f"{g.TAB}{new}\n"
+            res += f"{new}\n"
     res += "\n"
     return res
