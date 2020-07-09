@@ -7,6 +7,7 @@ from ui.tk_helper import change_button_color
 from ui.tk_helper import clear_colors
 import ui.language as en
 import utils.globals as g
+from utils.models import set_ctrl
 
 
 class UpdatePage(tk.Frame):
@@ -121,8 +122,17 @@ class UpdatePage(tk.Frame):
                     m_update = sect["model"].update(content=newstring)
                     m_update.execute()
                     is_title = True
-        self.title.update()
-        self.notes.update()
+        ctrl = set_ctrl()
+        title_string = self.title.get("1.0", tk.END)
+        print([title_string, g.TARGET_PAGE.name])
+        if title_string != g.TARGET_PAGE.name:
+            self.title.update()
+            title_string = self.title.get("1.0", tk.END).rstrip().title()
+            g.TARGET_PAGE = ctrl.update_page_name(g.TARGET, title_string)
+        if self.notes.get("1.0", tk.END) != g.TARGET_PAGE.notes:
+            self.notes.update()
+            ctrl.update_page_notes()
+        g.TARGET = title_string
 
     def cancel(self):
         clear_colors()

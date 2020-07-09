@@ -25,6 +25,7 @@ ADD_B1 = "Add Content"
 ADD_B2 = "Undo"
 ADD_B3 = "Save Page"
 ADD_B4 = "Clear"
+ADD_OK1 = "Added new page:"
 
 # Wiki Settings
 SETT_B1 = "Add Wiki"

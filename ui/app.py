@@ -14,8 +14,9 @@ from ui.page_add import AddPage
 from ui.page_update import UpdatePage
 from ui.page_delete import DelPage
 from ui.page_help import HelpPage
-from utils.models import init_database_info
-
+import utils.models as db
+g.MODELCTRL = db.set_ctrl()
+g.QUERY = db.set_query()
 
 class App():
     """Every button on the static interface should use self.replace() to
@@ -32,7 +33,7 @@ class App():
         self.static_searchbar()
         self.static_bottom_buttons()
         self.initial_frame()
-        init_database_info()
+        db.init_database_info()
         self.root.mainloop()
         g.DB.close()
 

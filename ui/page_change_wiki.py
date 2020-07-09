@@ -71,6 +71,8 @@ class SettingsPage(tk.Frame):
             jdb.change_profile(res)
             db.change_database(res)
             db.make_tables()
+            g.MODELCTRL = db.set_ctrl()
+            g.QUERY = db.set_query()
         else:
             self.errors["text"] = en.SETT_ERR1
         self.name_entry.delete(0, "end")
@@ -84,6 +86,8 @@ class SettingsPage(tk.Frame):
         self.set_loaded_display()
         self.swap.config(value=g.WIKI_LIST)
         self.set_combobox()
+        g.MODELCTRL = db.set_ctrl()
+        g.QUERY = db.set_query()
 
     def load_wiki(self):
         """Load button's function"""
@@ -94,6 +98,8 @@ class SettingsPage(tk.Frame):
         self.set_loaded_display()
         self.errors["text"] = f"{en.SETT_ERR4} {name}"
         self.set_combobox()
+        g.MODELCTRL = db.set_ctrl()
+        g.QUERY = db.set_query()
 
     def update_wiki_name(self):
         """Edit label: Name button's function"""
@@ -109,6 +115,8 @@ class SettingsPage(tk.Frame):
             db.init_database_info()
             self.set_loaded_display()
             self.errors["text"] = f"{en.SETT_ERR5} {old.replace('.db', '')} to {name}"
+            g.MODELCTRL = db.set_ctrl()
+            g.QUERY = db.set_query()
         else:
             self.errors["text"] = en.SETT_ERR1
 

@@ -6,6 +6,8 @@ DB = SqliteDatabase(DB_FILE)
 DBP = DatabaseProxy()
 DBP.initialize(DB) # Database connects when models.py gets imported from database.py
 DEFAULT_DB = "Default" # Display name on screen
+MODELCTRL = None
+QUERY = None
 # FILES/FOLDERS
 JSON_NAME = "db_info.json"
 JSON_TEMPLATE = {

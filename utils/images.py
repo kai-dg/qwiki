@@ -12,4 +12,5 @@ def initial_base_folder():
     """Creates"""
     create_base_folder()
     default = os.path.join(g.BASE_IMG_FOLDER, g.DEFAULT_DB)
-    os.makedirs(default)
+    if not os.path.exists(default):
+        os.makedirs(default)

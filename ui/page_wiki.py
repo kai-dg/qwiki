@@ -24,20 +24,19 @@ class WikiPage(tk.Frame):
 
     def query_entry(self):
         """Implement fuzzy finder here. search -> query -> suggestions -> not_found"""
-        query = set_query(g.TARGET)
-        q = query.full_page_match()
+        q = g.QUERY.full_page_match(g.TARGET)
         if len(q) == 1:
             g.TARGET_PAGE = q[0]
-            self.draw_query(query)
+            self.draw_query()
         else:
-            q = query.fuzzy_page_match()
+            q = query.fuzzy_page_match(g.TARGET)
             self.suggestions_page(q)
         if len(q) == 0:
             self.not_found()
             s.TARGET = ""
 
-    def draw_query(self, query):
-        cont = query.page_content()
+    def draw_query(self):
+        cont = g.QUERY.page_content(g.TARGET_PAGE)
         g.TARGET_PAGE_CONT = cont
         cont_sects = {i: tk.Text for i in range(len(cont)*2)}
         row_amt = ((len(cont)*2) + 2)
@@ -47,13 +46,13 @@ class WikiPage(tk.Frame):
         title = tk.Text(self.base, relief="flat", wrap="word", bg=s.BG2, padx=15,
                         pady=10, fg=s.SEARCHBG, highlightthickness=0, height=1,
                         font=(s.FONT2, 25, "bold"))
-        title.insert(tk.INSERT, g.TARGET_PAGE.name.rstrip())
+        title.insert(tk.INSERT, g.TARGET_PAGE.name)
         title.config(state="disabled")
         title.grid(row=0, sticky="ewn", rowspan=1)
         notes = tk.Text(self.base, relief="flat", bg=s.BG2, padx=25,
                         pady=10, fg=s.SEARCHBG, highlightthickness=0, height=1,
                         font=(s.FONT2, 12, "italic"))
-        notes.insert(tk.INSERT, g.TARGET_PAGE.notes.rstrip())
+        notes.insert(tk.INSERT, g.TARGET_PAGE.notes)
         new_height = int(round(float(notes.index(tk.END))))
         notes.config(height=new_height)
         notes.config(state="disabled")

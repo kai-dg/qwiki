@@ -6,7 +6,7 @@ import utils.globals as g
 from utils.controller import ModelCtrl
 from utils.controller import Query
 import os
-# Open app -> no database yet
+
 
 class BaseModel(Model):
     class Meta:
@@ -46,6 +46,21 @@ class Relations(BaseModel):
     page = ForeignKeyField(Page)
     pages = ManyToManyField(Page, backref="pages")
 
+def set_ctrl():
+    m = ModelCtrl()
+    return m
+
+def set_query():
+    q = Query()
+    return q
+    
+def init_database_info():
+    g.WIKI_DB_INFO = jdb.read_json()
+    g.DEFAULT_DB = g.WIKI_DB_INFO["active"]
+    g.DB_FILE = f"{g.DEFAULT_DB}.db"
+    g.WIKI_LIST = list(g.WIKI_DB_INFO["wikis"])
+    g.WIKI_LIST = [""] if g.WIKI_LIST == [] else g.WIKI_LIST
+
 def change_database(name):
     """Changes current database to `name`"""
     g.DB_FILE = f"{name}.db"
@@ -61,21 +76,6 @@ def make_tables():
     g.DB.create_tables([Relations.pages.get_through_model()])
     g.DB.create_tables([Tag.pages.get_through_model()])
     DatabaseInfo.create(set_tags="").save()
-
-def set_ctrl():
-    m = ModelCtrl(Page, Content, Tag, DatabaseInfo, Relations)
-    return m
-
-def set_query(name:str):
-    q = Query(name, Page, Content, Relations)
-    return q
-    
-def init_database_info():
-    g.WIKI_DB_INFO = jdb.read_json()
-    g.DEFAULT_DB = g.WIKI_DB_INFO["active"]
-    g.DB_FILE = f"{g.DEFAULT_DB}.db"
-    g.WIKI_LIST = list(g.WIKI_DB_INFO["wikis"])
-    g.WIKI_LIST = [""] if g.WIKI_LIST == [] else g.WIKI_LIST
 
 def rename_database(filename):
     if not g.DB.is_closed():
