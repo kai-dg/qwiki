@@ -30,9 +30,8 @@ class App():
         self.root.geometry(f"{s.W_HEIGHT}x{s.W_WIDTH}")
         self.root.bind("<Button-1>", self.fuzzy_on_off)
         self.frame = tk.Frame(self.root, bg=s.FG)
-        self.frame.place(relheight=1, relwidth=1, relx=0.5, rely=0.5, anchor="c")
+        place(self.frame, h=1, w=1, x=0.5, y=0.5, a="c")
         self.fuzz_bar_active = False
-        self.current_frame = None
         self.search_term = ""
         self.static_bottom_buttons()
         self.initial_frame()
@@ -40,6 +39,25 @@ class App():
         db.init_database_info()
         self.root.mainloop()
         g.DB.close()
+
+    def replace(self, cls):
+        """Controller for changing self.content frame. Deletes current frame
+        to wipe the non init tk objects from that page.
+        """
+        self.content.destroy()
+
+    def initial_frame(self):
+        """Initial screen when starting the app"""
+        self.content = tk.Frame(self.frame, bg=s.FG)
+        self.content.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04, anchor="n")
+        self.replace(HelpPage(self.frame, "help"))
+
+    def fuzzy_frame(self):
+        self.fuzz_bar = tk.Listbox(self.root, selectmode="multiple", height=1,
+                                   font=(15))
+        place(self.fuzz_bar, h="", w=0.6, x=0.2, y=0.04)
+        self.fuzz_bar.bind("<<ListboxSelect>>", self.fuzzy_query)
+        self.fuzz_bar.place_forget()
 
     def fuzzy_on_off(self, event):
         if self.fuzz_bar_active:
@@ -68,28 +86,6 @@ class App():
         self.fuzz_bar.destroy()
         self.fuzzy_frame()
         self.frame.focus()
-
-    def replace(self, cls):
-        """Controller for changing self.content frame. Deletes current frame
-        to wipe the non init tk objects from that page.
-        """
-        if self.current_frame:
-            self.current_frame = None
-        self.current_frame = cls
-        self.content.destroy()
-
-    def initial_frame(self):
-        """Initial screen when starting the app"""
-        self.content = tk.Frame(self.frame, bg=s.FG)
-        self.content.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04, anchor="n")
-        self.replace(HelpPage(self.frame, "help"))
-
-    def fuzzy_frame(self):
-        self.fuzz_bar = tk.Listbox(self.root, selectmode="multiple", height=1,
-                                   font=(15))
-        place(self.fuzz_bar, h="", w=0.6, x=0.2, y=0.04)
-        self.fuzz_bar.bind("<<ListboxSelect>>", self.fuzzy_query)
-        self.fuzz_bar.place_forget()
 
     def searchbar_display(self):
         """Everything in the top section (search bar and buttons)."""
