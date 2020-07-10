@@ -6,7 +6,6 @@ import ui.settings as s
 import utils.formatter as fm
 import ui.language as en
 import utils.globals as g
-from utils.models import set_query
 
 
 class DelPage(tk.Frame):
@@ -52,15 +51,15 @@ class DelPage(tk.Frame):
         self.content.destroy()
 
     def delete_page(self):
-        q = set_query(g.TARGET)
-        q.page_obj = g.TARGET_PAGE
-        cont = q.page_content()
-        for c in cont:
+        for c in g.TARGET_PAGE_CONT:
             c.delete().execute()
         g.TARGET_PAGE.delete().execute()
+        self.message_label["text"] = f"{g.TARGET} {en.CONFIRM_SUCCESS}"
+        g.TARGET_PAGE_CONT = None
+        g.TARGET_PAGE = None
+        g.TARGET = ""
         self.yes.destroy()
         self.no.destroy()
-        self.message_label["text"] = f"{g.TARGET} {en.CONFIRM_SUCCESS}"
         
     def buttons(self):
         self.yes = tk.Button(self.content, text="Yes", bg=s.SEARCHBG, fg=s.TEXT3,

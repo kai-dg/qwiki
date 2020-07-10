@@ -8,9 +8,7 @@ import ui.settings as s
 from ui.tk_helper import place
 from ui.tk_helper import change_button_color
 import ui.language as en
-from utils.models import Page
 import utils.formatter as fm
-from utils.models import set_ctrl
 import utils.globals as g
 from copy import deepcopy
 
