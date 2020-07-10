@@ -18,6 +18,7 @@ import utils.models as db
 g.MODELCTRL = db.set_ctrl()
 g.QUERY = db.set_query()
 
+
 class App():
     """Every button on the static interface should use self.replace() to
     change frames. Anything with static_ means any widget created in those functions

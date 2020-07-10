@@ -34,19 +34,18 @@ class UpdatePage(tk.Frame):
                                  fg=s.SEARCHFG, font=(s.FONT2, 20, "bold"))
         place(message_label, h=1, w=1, x=0, y=0)
 
-    def create_cont_sects(self, cont):
+    def create_cont_sects(self):
         data = {}
-        idx = 0
-        for i in cont:
-            data[idx] = {"text": tk.Text, "idx": i.idx, "model": i}
-            idx += 1
-            data[idx] = {"text": tk.Text, "idx": i.idx, "model": i}
+        page_idx = 0
+        for i in g.TARGET_PAGE_CONT:
+            data[page_idx] = {"tk": tk.Text, "idx": i.idx, "title": i.title}
+            page_idx += 1
+            data[page_idx] = {"tk": tk.Text, "idx": i.idx, "content": i.content}
         return data
 
     def draw_selection(self):
-        cont = g.TARGET_PAGE_CONT
-        self.cont_sects = self.create_cont_sects(cont)
-        row_amt = ((len(cont)*2) + 3)
+        self.cont_sects = self.create_cont_sects()
+        row_amt = ((len(list(self.cont_sects))) + 3)
         self.buttons(row_amt)
         for r in range(row_amt):
             self.base.grid_rowconfigure(r, weight=0)
@@ -55,39 +54,37 @@ class UpdatePage(tk.Frame):
                         pady=10, fg=s.SEARCHBG, highlightthickness=1, height=1,
                         font=(s.FONT2, 25, "bold"), highlightbackground="black",
                         highlightcolor=s.SEARCHFG)
-        self.title.insert(tk.INSERT, g.TARGET_PAGE.name.rstrip())
+        self.title.insert(tk.INSERT, g.TARGET_PAGE.name)
         self.title.grid(row=0, sticky="ewn", rowspan=1)
         self.notes = tk.Text(self.base, relief="flat", bg=s.BG2, padx=25,
                         pady=10, fg=s.SEARCHBG, highlightthickness=1, height=1,
                         font=(s.FONT2, 12, "italic"), highlightbackground="black",
                         highlightcolor=s.SEARCHFG)
-        self.notes.insert(tk.INSERT, g.TARGET_PAGE.notes.rstrip())
+        self.notes.insert(tk.INSERT, g.TARGET_PAGE.notes)
         new_height = int(round(float(self.notes.index(tk.END))))
         self.notes.config(height=new_height)
         self.notes.grid(row=1, sticky="ewns", rowspan=1)
-        row_idx = 2
-        sect_idx = 0
-        # TODO change loop to self.cont_sects instead of cont
-        for c in cont:
-            ctitle = self.cont_sects[sect_idx]["text"](self.base, relief="flat", wrap="word", bg=s.BG2,
-                             padx=15, pady=10, highlightthickness=1, height=1, 
-                             highlightcolor=s.SEARCHFG, fg=s.SEARCHBG, font=(
-                             s.FONT2,15, "bold"), highlightbackground="black")
-            ctitle.insert(tk.INSERT, c.title)
-            ctitle.grid(row=row_idx, sticky="ewns", rowspan=1)
-            self.cont_sects[sect_idx]["text"] = ctitle
+        for idx, data in self.cont_sects.items():
+            if data.get("title", "") != "":
+                ctitle = data["tk"](self.base, relief="flat", wrap="word", bg=s.BG2,
+                                 padx=15, pady=10, highlightthickness=1, height=1, 
+                                 highlightcolor=s.SEARCHFG, fg=s.SEARCHBG, font=(
+                                 s.FONT2,15, "bold"), highlightbackground="black")
+                ctitle.insert(tk.INSERT, data["title"])
+                ctitle.grid(row=idx+2, sticky="ewns", rowspan=1)
+                data["tk"] = ctitle
+            else:
             # bind click to changing font color
-            content = self.cont_sects[sect_idx+1]["text"](self.base, relief="flat", wrap="word", bg=s.BG2,
-                              padx=24, pady=10,  highlightbackground="black",
-                              fg=s.SEARCHBG, highlightthickness=1, height=5,
-                              highlightcolor=s.SEARCHFG, font=(s.FONT2, 11))
-            content.insert(tk.INSERT, c.content.rstrip())
-            new_height = int(round(float(content.index(tk.END))))
-            content.config(height=new_height)
-            content.grid(row=(row_idx+1), sticky="ewns", rowspan=1)
-            self.cont_sects[sect_idx+1]["text"] = content
-            row_idx += 2
-            sect_idx += 2
+                content = data["tk"](self.base, relief="flat", wrap="word", bg=s.BG2,
+                                  padx=24, pady=10,  highlightbackground="black",
+                                  fg=s.SEARCHBG, highlightthickness=1, height=5,
+                                  highlightcolor=s.SEARCHFG, font=(s.FONT2, 11))
+                content.insert(tk.INSERT, data["content"])
+                new_height = int(round(float(content.index(tk.END))))
+                content.config(height=new_height)
+                content.grid(row=idx+2, sticky="ewns", rowspan=1)
+                data["tk"] = content
+
 
     def buttons(self, row_idx):
         button_base = tk.Frame(self.base, bg=s.FG)
@@ -105,34 +102,32 @@ class UpdatePage(tk.Frame):
         """Updates self.cont_sects, self.title, and self.notes.
         Formats self.cont_sects into data for updating Content model.
         """
+        data = {
+            "name": self.title.get("1.0", tk.END),
+            "notes": self.notes.get("1.0", tk.END)
+        }
+        if data["name"] != g.TARGET_PAGE.name:
+            self.title.update()
+            data["name"] = self.title.get("1.0", tk.END).rstrip().title()
+            new_page = g.MODELCTRL.update_page(g.TARGET, data)
+        if data["notes"] != g.TARGET_PAGE.notes:
+            self.notes.update()
+            data["notes"] = self.notes.get("1.0", tk.END).rstrip().capitalize()
+            new_page = g.MODELCTRL.update_page(g.TARGET, data)
+        g.TARGET = self.title.get("1.0", tk.END).rstrip().title()
+        g.TARGET_PAGE = g.QUERY.full_page_match(g.TARGET)[0]
         #s_title = self.cont_sects[idx]["text"].get("1.0", tk.END)
         # title -> content -> repeat order
-        is_title = True
-        for sect in self.cont_sects.values():
-            oldstring = sect["text"].get("1.0", tk.END)
-            sect["text"].update()
-            newstring = sect["text"].get("1.0", tk.END)
-            if is_title:
-                if oldstring != sect["model"].title:
-                    m_update = sect["model"].update(title=newstring)
-                    m_update.execute()
-                    is_title = False
+        for idx, sect in self.cont_sects.items():
+            sect["tk"].update()
+            newstring = sect["tk"].get("1.0", tk.END)
+            if sect.get("title", "") != "":
+                sect["title"] = newstring
+                cont = g.MODELCTRL.update_content(g.TARGET_PAGE, sect)
             else:
-                if oldstring != sect["model"].content:
-                    m_update = sect["model"].update(content=newstring)
-                    m_update.execute()
-                    is_title = True
-        ctrl = set_ctrl()
-        title_string = self.title.get("1.0", tk.END)
-        print([title_string, g.TARGET_PAGE.name])
-        if title_string != g.TARGET_PAGE.name:
-            self.title.update()
-            title_string = self.title.get("1.0", tk.END).rstrip().title()
-            g.TARGET_PAGE = ctrl.update_page_name(g.TARGET, title_string)
-        if self.notes.get("1.0", tk.END) != g.TARGET_PAGE.notes:
-            self.notes.update()
-            ctrl.update_page_notes()
-        g.TARGET = title_string
+                sect["content"] = newstring
+                cont = g.MODELCTRL.update_content(g.TARGET_PAGE, sect)
+        g.TARGET_PAGE_CONT = g.QUERY.page_content(g.TARGET_PAGE)
 
     def cancel(self):
         clear_colors()

@@ -25,8 +25,8 @@ class ModelCtrl:
             res: contains Page model obj and a message for display
         """
         p = self.page.create(
-            name = data["name"],
-            notes = data["notes"],
+            name = data["name"].title().rstrip(),
+            notes = data["notes"].capitalize().rstrip(),
             img_path = "",
             img_title = ""
         )
@@ -41,9 +41,9 @@ class ModelCtrl:
         for k, v in data.items():
             res = self.cont.create(
                 page = target,
-                title = v["title"],
+                title = v["title"].title().rstrip(),
                 idx = k,
-                content = v["cont"],
+                content = v["cont"].capitalize().rstrip(),
                 content_img = "",
                 content_img_title = ""
             )
@@ -55,34 +55,31 @@ class ModelCtrl:
         if data["name"] != "" and data["notes"] != "":
             q = (db.Page.update(name=data["name"], notes=data["notes"]).
                  where(db.Page.name==target_name))
+            q.execute()
         elif data["name"] != "":
-            q = (db.Page.update(name=data["name"]).
+            q = (db.Page.update(name=data["name"].title().rstrip()).
                  where(db.Page.name==target_name))
+            q.execute()
         else:
-            q = (db.Page.update(notes=data["notes"]).
+            q = (db.Page.update(notes=data["notes"].capitalize().rstrip()).
                  where(db.Page.name==target_name))
-        if q:
             q.execute()
         return q
 
-    def update_content(self, target_page, idx, data):
+    def update_content(self, target_page, data):
         """data keys: title, idx, content
         TODO: implement idx swapping
         """
         q = None
-        if data["title"] != "" and data["content"] != "":
-            q = (db.Content.update(title=data["title"],
-                 content=data["content"]).where(db.Content.page==target_page,
-                 db.Content.idx==idx))
-        elif data["title"] != "":
-            q = (db.Content.update(title=data["title"]).
+        if data.get("title", "") != "":
+            q = (db.Content.update(title=data["title"].title().rstrip()).
                  where(db.Content.page==target_page,
-                 db.Content.idx==idx))
+                 db.Content.idx==data["idx"]))
+            q.execute()
         else:
-            q = (db.Content.update(content=data["content"]).
+            q = (db.Content.update(content=data["content"].capitalize().rstrip()).
                  where(db.Content.page==target_page,
-                 db.Content.idx==idx))
-        if q:
+                 db.Content.idx==data["idx"]))
             q.execute()
         return q
 

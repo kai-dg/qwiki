@@ -29,7 +29,7 @@ class WikiPage(tk.Frame):
             g.TARGET_PAGE = q[0]
             self.draw_query()
         else:
-            q = query.fuzzy_page_match(g.TARGET)
+            q = g.QUERY.fuzzy_page_match(g.TARGET)
             self.suggestions_page(q)
         if len(q) == 0:
             self.not_found()
@@ -52,7 +52,7 @@ class WikiPage(tk.Frame):
         notes = tk.Text(self.base, relief="flat", bg=s.BG2, padx=25,
                         pady=10, fg=s.SEARCHBG, highlightthickness=0, height=1,
                         font=(s.FONT2, 12, "italic"))
-        notes.insert(tk.INSERT, g.TARGET_PAGE.notes)
+        notes.insert(tk.INSERT, fm.format_note(g.TARGET_PAGE.notes).rstrip())
         new_height = int(round(float(notes.index(tk.END))))
         notes.config(height=new_height)
         notes.config(state="disabled")

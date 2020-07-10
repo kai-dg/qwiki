@@ -165,7 +165,7 @@ class AddPage(tk.Frame):
         self.info.grid_columnconfigure(0, weight=1)
         for e in range(0, len(self.errors.keys())):
             self.info.grid_rowconfigure(e, weight=0)
-            err = self.errors[e](self.info, bg=s.FG, font=(s.FONT2, 10),
+            err = self.errors[e](self.info, bg=s.FG, font=(s.FONT2, 10, "bold"),
                                  wrap="word", relief="flat", height=1,
                                  fg=s.BUTTON_R)
             err.config(state="disabled")
