@@ -143,19 +143,23 @@ class AddPage(tk.Frame):
             popped = self.display_objs.pop()
         if len(self.display_objs) > 1:
             del self.page_data["cont"][g.IDX-1]
-            g.IDX -= 1
         else:
             self.page_data = deepcopy(g.PAGE_TEMPLATE)
 
     def create_page(self):
         """Executing Create Page button."""
-        page = g.MODELCTRL.add_page(self.page_data["page"])
-        g.MODELCTRL.add_content(self.page_data["cont"], page)
+        if self.page_data["page"]["name"] != "":
+            page = g.MODELCTRL.add_page(self.page_data["page"])
+            g.MODELCTRL.add_content(self.page_data["cont"], page)
+            self.clear_all()
+            self.errors[0].config(state="normal")
+            self.errors[0].insert(tk.INSERT, f"{en.ADD_OK1} {page.name}")
+            self.errors[1].config(state="disabled")
+        else:
+            self.errors[0].config(state="normal")
+            self.errors[0].insert(tk.INSERT, en.ERR_ADD2)
+            self.errors[1].config(state="disabled")
 
-        self.clear_all()
-        self.errors[0].config(state="normal")
-        self.errors[0].insert(tk.INSERT, f"{en.ADD_OK1} {page.name}")
-        self.errors[1].config(state="disabled")
 
     def display(self):
         self.info = tk.Frame(self.right, bg=s.FG, padx=20, pady=20)
