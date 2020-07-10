@@ -28,15 +28,46 @@ class App():
         self.root = tk.Tk()
         self.root.title(s.TITLE)
         self.root.geometry(f"{s.W_HEIGHT}x{s.W_WIDTH}")
+        self.root.bind("<Button-1>", self.fuzzy_on_off)
         self.frame = tk.Frame(self.root, bg=s.FG)
         self.frame.place(relheight=1, relwidth=1, relx=0.5, rely=0.5, anchor="c")
+        self.fuzz_bar_active = False
         self.current_frame = None
-        self.static_searchbar()
+        self.search_term = ""
         self.static_bottom_buttons()
         self.initial_frame()
+        self.searchbar_display()
         db.init_database_info()
         self.root.mainloop()
         g.DB.close()
+
+    def fuzzy_on_off(self, event):
+        if self.fuzz_bar_active:
+            self.fuzz_bar.place_forget()
+            self.fuzz_bar.delete(0, "end")
+
+    def fuzzy_searchbar(self, event):
+        self.search_term = self.searchbar.get()
+        if self.search_term != "":
+            self.fuzz_bar.delete(0, "end")
+            suggestions = g.QUERY.fuzzy_page_match(self.search_term)
+            self.fuzz_bar.config(height=len(suggestions))
+            for item in suggestions:
+                self.fuzz_bar.insert("end", item.name)  
+            self.fuzz_bar_active = True
+            place(self.fuzz_bar, h="", w=0.6, x=0.2, y=0.04)
+        else:
+            self.fuzz_bar.place_forget()
+            self.fuzz_bar.delete(0, "end")
+        self.searchbar.focus()
+
+    def fuzzy_query(self, query):
+        name = query.widget.get(query.widget.curselection())
+        self.replace(WikiPage(self.frame, name))
+        self.fuzz_bar_active = False
+        self.fuzz_bar.destroy()
+        self.fuzzy_frame()
+        self.frame.focus()
 
     def replace(self, cls):
         """Controller for changing self.content frame. Deletes current frame
@@ -53,28 +84,37 @@ class App():
         self.content.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04, anchor="n")
         self.replace(HelpPage(self.frame, "help"))
 
-    def static_searchbar(self):
+    def fuzzy_frame(self):
+        self.fuzz_bar = tk.Listbox(self.root, selectmode="multiple", height=1,
+                                   font=(15))
+        place(self.fuzz_bar, h="", w=0.6, x=0.2, y=0.04)
+        self.fuzz_bar.bind("<<ListboxSelect>>", self.fuzzy_query)
+        self.fuzz_bar.place_forget()
+
+    def searchbar_display(self):
         """Everything in the top section (search bar and buttons)."""
-        frame_search = tk.Frame(self.frame, bg=s.SEARCHBG)
-        place(frame_search, h=0.04, w=2, x=0.1, y=0, a="n")
-        self.searchlabel = tk.Label(frame_search, text=g.DEFAULT_DB, bg=s.SEARCHBG,
+        self.frame_search = tk.Frame(self.frame, bg=s.SEARCHBG)
+        place(self.frame_search, h=0.04, w=2, x=0.1, y=0, a="n")
+        self.searchlabel = tk.Label(self.frame_search, text=g.DEFAULT_DB, bg=s.SEARCHBG,
                                      font=(s.FONT1, 9, "bold"), anchor="center")
         place(self.searchlabel, h=1, w=0.1, x=0.45, y=0)
-        self.searchbar = tk.Entry(frame_search, font=(s.FONT2, 12), bg=s.SEARCHFG,
+        self.searchbar = tk.Entry(self.frame_search, font=(s.FONT2, 12), bg=s.SEARCHFG,
                                   fg=s.TEXT2, borderwidth=8, relief="flat")
+        self.searchbar.bind('<KeyRelease>', self.fuzzy_searchbar)
         self.searchbar.bind("<Return>", (lambda event: self.replace(
                             WikiPage(self.frame, self.searchbar.get()))))
         place(self.searchbar, h=1, w=0.3, x=0.55, y=0)
-        searchbutton = tk.Button(frame_search, text=en.SEARCH_B1, font=(s.FONT2, 9),
+        searchbutton = tk.Button(self.frame_search, text=en.SEARCH_B1, font=(s.FONT2, 9),
                                  bg=s.BUTTON_D, fg=s.TEXT1, activebackground=s.BUTTON_A,
                                  activeforeground=s.TEXT2,
                                  command=lambda: self.replace(WikiPage(self.frame,
                                  self.searchbar.get())))
         place(searchbutton, h=1, w=0.05, x=0.85, y=0)
-        search_by_tag = tk.Button(frame_search, text=en.SEARCH_B2, font=(s.FONT2, 9),
+        search_by_tag = tk.Button(self.frame_search, text=en.SEARCH_B2, font=(s.FONT2, 9),
                                  bg=s.BUTTON_D, fg=s.TEXT1, activebackground=s.BUTTON_A,
                                  activeforeground=s.TEXT2)
         place(search_by_tag, h=1, w=0.05, x=0.90, y=0)
+        self.fuzzy_frame()
 
     def static_bottom_buttons(self):
         """Everything on the bottom section (the row of buttons)."""

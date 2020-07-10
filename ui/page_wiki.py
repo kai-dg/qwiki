@@ -25,13 +25,13 @@ class WikiPage(tk.Frame):
     def query_entry(self):
         """Implement fuzzy finder here. search -> query -> suggestions -> not_found"""
         q = g.QUERY.full_page_match(g.TARGET)
-        if len(q) == 1:
+        if len(q) == 1 and g.TARGET != "":
             g.TARGET_PAGE = q[0]
             self.draw_query()
-        else:
+        elif len(q) > 1:
             q = g.QUERY.fuzzy_page_match(g.TARGET)
             self.suggestions_page(q)
-        if len(q) == 0:
+        else:
             self.not_found()
             s.TARGET = ""
 
