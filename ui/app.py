@@ -8,12 +8,12 @@ import utils.json_database as jdb # Need this to prevent circular import
 from ui.tk_helper import place
 from ui.tk_helper import refresh_globals
 import ui.language as en
-from ui.page_wiki import WikiPage
-from ui.page_change_wiki import SettingsPage
-from ui.page_add import AddPage
-from ui.page_update import UpdatePage
-from ui.page_delete import DelPage
-from ui.page_help import HelpPage
+from ui.pages.page_wiki import WikiPage
+from ui.pages.page_change_wiki import SettingsPage
+from ui.pages.page_add import AddPage
+from ui.pages.page_update import UpdatePage
+from ui.pages.page_delete import DelPage
+from ui.pages.page_help import HelpPage
 import utils.models as db
 g.MODELCTRL = db.set_ctrl()
 g.QUERY = db.set_query()
@@ -68,7 +68,8 @@ class App():
         self.search_term = self.searchbar.get()
         if self.search_term != "":
             self.fuzz_bar.delete(0, "end")
-            suggestions = g.QUERY.fuzzy_page_match(self.search_term)
+            suggestions = g.QUERY.fuzzy_page_match(self.search_term,
+                                                   s.SEARCHBAR_PG_LIMIT)
             self.fuzz_bar.config(height=len(suggestions))
             for item in suggestions:
                 self.fuzz_bar.insert("end", item.name)  

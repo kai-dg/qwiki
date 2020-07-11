@@ -4,6 +4,8 @@ These models are controllers for adding, updating, and deleting from db.
 """
 from difflib import SequenceMatcher as SM
 import utils.models as db
+import concurrent.futures
+import ui.settings as s
 
 
 class ModelCtrl:
@@ -114,16 +116,16 @@ class Query:
             return p
         return []
 
-    def fuzzy_finder(self, query, target):
+    def fuzzy_percentage(self, query, target):
         return SM(None, target, query).ratio()
 
-    def fuzzy_page_match(self, name) -> list:
-        """iterator method needed for less mem by no caching"""
+    def fuzzy_loopy(self, name, limit, tolerance) -> list:
         res = []
         maxi = 0
-        tolerance = 0.55
         for p in self.page.select().iterator():
-            perc = self.fuzzy_finder(p.name, name)
+            perc = self.fuzzy_percentage(p.name, name)
+            if len(res) >= limit:
+                break
             if perc > tolerance:
                 if maxi < perc:
                     maxi = perc
@@ -131,4 +133,13 @@ class Query:
                 else:
                     res.append(p)
         return res
-        
+
+    def fuzzy_page_match(self, name, pg_limit) -> list:
+        """iterator method needed for less mem usage"""
+        limit = int(pg_limit * 1.5)
+        args = [(name, limit, s.FUZZY_HI_TOLERANCE), (name, limit, s.FUZZY_LO_TOLERANCE)]
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            results = [executor.submit(self.fuzzy_loopy, n, lim, tol) for n, lim, tol in args]
+        if results[0].result() == []:
+            return results[1].result()
+        return results[0].result()
