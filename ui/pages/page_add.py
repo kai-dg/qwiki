@@ -55,9 +55,9 @@ class AddPage(tk.Frame):
         notes = self.notes_entry.get()
         data = {
             "page_name": name.rstrip().title(),
-            "notes": notes.rstrip().capitalize(),
+            "notes": fm.format_note(notes),
             "header": header.rstrip().title(),
-            "content": content.rstrip().capitalize()
+            "content": fm.format_content(content)
         }
         return data
 
@@ -92,13 +92,13 @@ class AddPage(tk.Frame):
 
     def grid_data(self):
         page = self.page_data["page"]
-        page_row = tk.Text(self.info, bg=s.FG, font=(s.FONT2, 15, "bold"),
+        page_row = tk.Text(self.info, bg=s.FG, font=(s.FONT2, 17, "bold"),
                            wrap="word", relief="flat", height=1, fg=s.SEARCHFG)
         page_row.insert(tk.INSERT, page["name"])
         page_row.grid(row=self.err_amt, sticky="ewns", rowspan=1)
         notes_row = tk.Text(self.info, bg=s.FG, font=(s.FONT2, 9, "italic"),
                            wrap="word", relief="flat", height=1, fg=s.SEARCHFG)
-        notes_row.insert(tk.INSERT, fm.format_note(page["notes"]))
+        notes_row.insert(tk.INSERT, page["notes"])
         new_height = int(round(float(notes_row.index(tk.END))))
         notes_row.config(height=new_height)
         notes_row.grid(row=self.err_amt+1, sticky="ewns", rowspan=1)
@@ -108,12 +108,12 @@ class AddPage(tk.Frame):
         for idx, v in cont.items():
             self.info.grid_rowconfigure(row_idx, weight=0)
             self.info.grid_rowconfigure(row_idx+1, weight=0)
-            title = tk.Text(self.info, bg=s.FG, font=(s.FONT2, 10, "bold"),
-                            wrap="word", relief="flat", height=1, fg=s.SEARCHFG)
+            title = tk.Text(self.info, bg=s.FG, font=(s.FONT2, 12, "bold"),
+                            wrap="word", relief="flat", height=1, fg=s.SEARCHBG)
             title.insert(tk.INSERT, v["title"])
             title.config(state="disabled")
             title.grid(row=(row_idx), sticky="ewns", rowspan=1)
-            content = tk.Text(self.info, bg=s.FG, font=(s.FONT2, 8, "bold"),
+            content = tk.Text(self.info, bg=s.FG, font=(s.FONT2, 8),
                             wrap="word", relief="flat", height=1, fg=s.SEARCHFG)
             content.insert(tk.INSERT, v["cont"])
             content.config(state="disabled")

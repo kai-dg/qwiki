@@ -11,6 +11,9 @@ def format_title(name:str) -> str:
 def format_note(notes:str) -> str:
     res = f"{notes.rstrip()}"
     if notes != "":
+        m = re.search(r"[a-zA-Z]", notes)
+        if m:
+            notes = notes.replace(notes[m.start()], notes[m.start()].upper(), 1)
         res = f"[Notes] {notes.rstrip()}"
     return res
 
@@ -21,15 +24,14 @@ def format_header(header:str) -> str:
     return res
 
 def format_content(content:str) -> str:
-    res = ""
-    splitted = content.rstrip().split("\n")
-    for i in splitted:
-        if i[0] != " " and i[0] != "\t":
-            res += f"- {i.capitalize()}\n"
+    idx = 0
+    res = content.rstrip().split("\n")
+    for line in res:
+        temp = line.rstrip()
+        m = re.search(r"[a-zA-Z]", temp)
+        if m:
+            res[idx] = temp.replace(temp[m.start()], temp[m.start()].upper(), 1)
         else:
-            m = re.search(r"[a-zA-Z]", i)
-            first = i[m.start()]
-            new = i.replace(i[m.start()], i[m.start()].upper(), 1)
-            res += f"{new}\n"
-    res += "\n"
-    return res
+            res[idx] = temp
+        idx += 1
+    return "\n".join(res)
