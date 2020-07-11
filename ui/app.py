@@ -98,8 +98,8 @@ class App():
         self.searchbar = tk.Entry(self.frame_search, font=(s.FONT2, 12), bg=s.SEARCHFG,
                                   fg=s.TEXT2, borderwidth=8, relief="flat")
         self.searchbar.bind('<KeyRelease>', self.fuzzy_searchbar)
-        self.searchbar.bind("<Return>", (lambda event: self.replace(
-                            WikiPage(self.frame, self.searchbar.get()))))
+        self.searchbar.bind("<Return>", (lambda event: [self.replace(
+                            WikiPage(self.frame, self.searchbar.get()))]))
         place(self.searchbar, h=1, w=0.3, x=0.55, y=0)
         searchbutton = tk.Button(self.frame_search, text=en.SEARCH_B1, font=(s.FONT2, 9),
                                  bg=s.BUTTON_D, fg=s.TEXT1, activebackground=s.BUTTON_A,

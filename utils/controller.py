@@ -85,6 +85,14 @@ class ModelCtrl:
             q.execute()
         return q
 
+    def delete_page(self, name):
+        d = self.page.delete().where(self.page.name==name)
+        d.execute()
+
+    def delete_content(self, page_obj):
+        d = self.cont.delete().where(self.cont.page==page_obj)
+        d.execute()
+
     def set_tag(self, new:str) -> str:
         """`new` should be just the tag without commas."""
         q = self.d_info.select()[0] # Only 1 column should exist

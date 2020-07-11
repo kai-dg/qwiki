@@ -51,9 +51,8 @@ class DelPage(tk.Frame):
         self.content.destroy()
 
     def delete_page(self):
-        for c in g.TARGET_PAGE_CONT:
-            c.delete().execute()
-        g.TARGET_PAGE.delete().execute()
+        g.MODELCTRL.delete_content(g.TARGET_PAGE)
+        g.MODELCTRL.delete_page(g.TARGET)
         self.message_label["text"] = f"{g.TARGET} {en.CONFIRM_SUCCESS}"
         g.TARGET_PAGE_CONT = None
         g.TARGET_PAGE = None
