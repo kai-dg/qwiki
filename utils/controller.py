@@ -120,6 +120,7 @@ class Query:
         return SM(None, target, query).ratio()
 
     def fuzzy_loopy(self, name, limit, tolerance) -> list:
+        """iterator method needed for less mem usage"""
         res = []
         maxi = 0
         for p in self.page.select().iterator():
@@ -135,7 +136,6 @@ class Query:
         return res
 
     def fuzzy_page_match(self, name, pg_limit) -> list:
-        """iterator method needed for less mem usage"""
         limit = int(pg_limit * 1.5)
         args = [(name, limit, s.FUZZY_HI_TOLERANCE), (name, limit, s.FUZZY_LO_TOLERANCE)]
         with concurrent.futures.ThreadPoolExecutor() as executor:

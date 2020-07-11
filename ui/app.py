@@ -9,7 +9,7 @@ from ui.tk_helper import place
 from ui.tk_helper import refresh_globals
 import ui.language as en
 from ui.pages.page_wiki import WikiPage
-from ui.pages.page_change_wiki import SettingsPage
+from ui.pages.page_settings import SettingsPage
 from ui.pages.page_add import AddPage
 from ui.pages.page_update import UpdatePage
 from ui.pages.page_delete import DelPage
