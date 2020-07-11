@@ -28,12 +28,13 @@ class WikiPage(tk.Frame):
         if len(q) == 1 and g.TARGET != "":
             g.TARGET_PAGE = q[0]
             self.draw_query()
-        elif len(q) > 1:
-            q = g.QUERY.fuzzy_page_match(g.TARGET)
-            self.suggestions_page(q)
-        else:
-            self.not_found()
-            s.TARGET = ""
+        if len(q) == 0:
+            fuzz = g.QUERY.suggestions_match(g.TARGET)
+            if len(fuzz) != 0:
+                self.suggestions_page(fuzz)
+            else:
+                self.not_found()
+                s.TARGET = ""
 
     def draw_query(self):
         cont = g.QUERY.page_content(g.TARGET_PAGE)
@@ -79,19 +80,39 @@ class WikiPage(tk.Frame):
             row_idx += 2
             sect_idx += 2
 
+    def set_page(self, page_obj):
+        """For suggestion buttons"""
+        g.TARGET_PAGE = page_obj
+        g.TARGET = page_obj.name
+        self.base.destroy()
+        self.base = tk.Frame(self.content, bg=s.FG, padx=25, pady=25)
+        place(self.base, h=1, w=0.5, x=0.402, y=0)
+        
     def suggestions_page(self, q_list):
-        sections = {i: tk.Label for i in range(len(q_list)*2)}
+        sections = {}
         idx = 0
+        col = 0
+        ro = 0
+        self.base.grid_columnconfigure(0, weight=1)
         for i in q_list:
-            qtitle = sections[idx](self.base, text=i.name.rstrip(), justify="left")
-            qtitle.grid(row=(idx+1), columnspan=1, sticky="w")
-            qnotes = sections[idx](self.base, text=i.notes.rstrip(), justify="left",
-                                    padx=12)
-            qnotes.grid(row=(idx+2), columnspan=1, sticky="w")
+            if idx == s.SUGGESTION_PG_LIMIT:
+                ro = 0
+                col = 1
+                self.base.grid_columnconfigure(col, weight=1)
+            self.base.grid_rowconfigure(ro, weight=1)
+            self.base.grid_rowconfigure(ro+1, weight=1)
+            qtitle = tk.Button(self.base, text=i.name, font=(s.FONT2, 17, "bold"),
+                               relief="flat", bg=s.BG2, fg=s.SEARCHFG, command=
+                               lambda m=i: [self.set_page(m), self.draw_query()])
+            qtitle.grid(row=ro, column=col, sticky="w")
+            sections[idx] = qtitle
+            notes = fm.format_note(i.notes)
+            qnotes = tk.Label(self.base, text=notes, justify="left", bg=s.FG,
+                              fg=s.SEARCHBG)
+            qnotes.grid(row=(ro+1), column=col, sticky="nw")
+            sections[idx+1] = qnotes
+            ro += 2
             idx += 2
-
-    def no_database(self):
-        pass
 
     def not_found(self):
         self.error = tk.Frame(self.parent, bg=s.FG)

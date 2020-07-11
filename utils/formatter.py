@@ -9,9 +9,9 @@ def format_title(name:str) -> str:
     return res
 
 def format_note(notes:str) -> str:
-    res = f"{notes}"
+    res = f"{notes.rstrip()}"
     if notes != "":
-        res = f"[Notes] {notes}"
+        res = f"[Notes] {notes.rstrip()}"
     return res
 
 def format_header(header:str) -> str:

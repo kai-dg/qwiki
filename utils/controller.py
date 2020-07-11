@@ -134,14 +134,14 @@ class Query:
     def fuzzy_loopy(self, name, limit, tolerance) -> list:
         """iterator method needed for less mem usage"""
         res = []
-        maxi = 0
+        maximum = 0
         for p in self.page.select().iterator():
             perc = self.fuzzy_percentage(p.name, name)
             if len(res) >= limit:
                 break
             if perc > tolerance:
-                if maxi < perc:
-                    maxi = perc
+                if perc > maximum:
+                    maximum = perc
                     res.insert(0, p)
                 else:
                     res.append(p)
@@ -149,9 +149,23 @@ class Query:
 
     def fuzzy_page_match(self, name, pg_limit) -> list:
         limit = int(pg_limit * 1.5)
-        args = [(name, limit, s.FUZZY_HI_TOLERANCE), (name, limit, s.FUZZY_LO_TOLERANCE)]
+        args = [(name, limit, s.FUZZY_HI_TOLERANCE),
+                (name, limit, s.FUZZY_LO_TOLERANCE)]
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            results = [executor.submit(self.fuzzy_loopy, n, lim, tol) for n, lim, tol in args]
+            results = [executor.submit(self.fuzzy_loopy, n, lim, tol)
+                       for n, lim, tol in args]
         if results[0].result() == []:
             return results[1].result()
         return results[0].result()
+
+    def suggestions_match(self, name) -> list:
+        res = []
+        maximum = 0
+        for p in self.page.select().iterator():
+            perc = self.fuzzy_percentage(p.name, name)
+            if perc > maximum:
+                maximum = perc
+                res.insert(0, p)
+            else:
+                res.append(p)
+        return res[:s.SUGGESTION_PG_LIMIT]
