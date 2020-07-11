@@ -49,6 +49,8 @@ SETT_ERR3 = "Incorrect file type. Please choose a '.db' file."
 SETT_ERR4 = "Loaded wiki:"
 SETT_ERR5 = "Changed wiki's name"
 SETT_DIS1 = "Currently Loaded Wiki:"
+SETT_DIS2 = "# of Pages:"
+SETT_DIS3 = "# of Tags:"
 
 # Wiki Page (Search)
 WIKI_ERR1 = "Page not found."

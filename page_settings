@@ -1,0 +1,4 @@
+[master 17f9c22] page_change_wiki -
+ 4 files changed, 2 insertions(+), 12 deletions(-)
+ rename ui/pages/{page_change_wiki.py => page_settings.py} (100%)
+ delete mode 100644 ui/pages/page_tags.py

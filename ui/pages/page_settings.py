@@ -43,7 +43,7 @@ class SettingsPage(tk.Frame):
         self.buttons()
 
     def set_combobox(self):
-        """Sets the dropbox menu on Load: label"""
+        """Sets the dropbox menu on the label Load:"""
         self.swap.set(g.DEFAULT_DB)
 
     def set_loaded_display(self):
@@ -121,13 +121,13 @@ class SettingsPage(tk.Frame):
             self.errors["text"] = en.SETT_ERR1
 
     def update_wiki_desc(self):
-        """Edit label: Desc. button's function"""
+        """Label Edit: Button Desc. function"""
         desc = self.change_entry.get()
         jdb.update_profile_desc(desc)
         self.set_loaded_display()
 
     def get_filepath(self):
-        """Import label: Browse... button's function"""
+        """Label Import: Button Browse... function"""
         filename = askopenfilename()
         if filename == "":
             pass
@@ -224,6 +224,11 @@ class SettingsPage(tk.Frame):
         self.description = tk.Label(self.info, text=g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB],
                                     font=(s.FONT1, 11), anchor="w", bg=s.BG2, fg=s.SEARCHBG)
         place(self.description, h=0.04, w=0.9, x=0.052, y=0.1)
+        page_amt = f"{en.SETT_DIS2} {g.QUERY.page_amt_stats()}"
+        tag_amt = f"{en.SETT_DIS3}"
+        self.loaded_stats = tk.Label(self.info, text=page_amt, bg=s.BG2, fg=s.SEARCHBG,
+                                     anchor="w", font=(s.FONT1, 11))
+        place(self.loaded_stats, h=0.04, w=0.4, x=0.052, y=0.17)
 
     def layout(self):
         """All partitions are relative to self.content"""

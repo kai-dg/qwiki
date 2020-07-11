@@ -99,6 +99,10 @@ class Query:
         self.content = db.Content
         #self.rel = db.Relations
 
+    def page_amt_stats(self):
+        q = self.page.select()
+        return len(q)
+
     def pages(self, name):
         q = self.page.select().where(self.page.name==name)
         return q
