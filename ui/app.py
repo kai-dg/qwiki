@@ -30,7 +30,7 @@ class App():
         self.root.title(s.TITLE)
         self.root.geometry(f"{s.W_HEIGHT}x{s.W_WIDTH}")
         self.root.bind("<Button-1>", self.fuzzy_on_off)
-        self.frame = tk.Frame(self.root)
+        self.frame = tk.Frame(self.root, bg=s.FG)
         place(self.frame, h=1, w=1, x=0.5, y=0.5, a="c")
         self.fuzz_bar_active = False
         self.search_term = ""

@@ -63,7 +63,7 @@ class WikiPageStyles:
                            fg=s.SEARCHFG)
 
     def qnotes(self, label_obj):
-        label_obj.config(text=notes, justify="left", bg=s.FG, fg=s.SEARCHBG)
+        label_obj.config(justify="left", bg=s.FG, fg=s.SEARCHBG)
 
     def not_found(self, pg):
         pg.err_f.config(bg=s.FG)
@@ -96,7 +96,7 @@ class AddPageStyles:
 
     def display(self, pg):
         pg.display_f.config(bg=s.FG, padx=20, pady=20)
-        
+
     def page_title(self, text_obj):
         text_obj.config(bg=s.FG, font=(s.FONT2, 17, "bold"), wrap="word",
                         relief="flat", height=1, fg=s.SEARCHFG)
@@ -143,7 +143,7 @@ class UpdatePageStyles:
 
     def no_selection(self, pg):
         pg.message_l.config(text=en.UP_ERR_1, bg=s.FG, fg=s.SEARCHFG,
-                         font=(s.FONT2, 20, "bold"))
+                            font=(s.FONT2, 20, "bold"))
 
     def c_title(self, text_obj):
         text_obj.config(relief="flat", wrap="word", bg=s.BG2,

@@ -9,6 +9,7 @@ import utils.formatter as fm
 import ui.language as en
 import utils.globals as g
 from ui.tk_styles import WikiPageStyles
+from tkinter import ttk
 
 
 class WikiPage(tk.Frame):
@@ -18,9 +19,9 @@ class WikiPage(tk.Frame):
         clear_colors()
         g.TARGET = entry.title().rstrip()
         self.content = tk.Frame(parent)
-        place(self.content, h=0.93, w=2, x=0.2, y=0.04, a="n")
+        place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.base_f = tk.Frame(self.content)
-        place(self.base_f, h=1, w=0.5, x=0.402, y=0)
+        place(self.base_f, h=1, w=1, x=0, y=0)
         self.styles = WikiPageStyles(self)
         self.query_entry()
 
@@ -51,6 +52,7 @@ class WikiPage(tk.Frame):
         self.title_t.config(state="disabled")
         self.title_t.grid(row=0, sticky="ewn", rowspan=1)
         self.notes_t = tk.Text(self.base_f)
+        self.styles.draw_query(self)
         self.notes_t.insert(tk.INSERT, fm.format_note(g.TARGET_PAGE.notes).rstrip())
         new_height = int(round(float(self.notes_t.index(tk.END))))
         self.notes_t.config(height=new_height)
@@ -58,20 +60,19 @@ class WikiPage(tk.Frame):
         self.notes_t.grid(row=1, sticky="ewns", rowspan=1)
         row_idx = 2
         sect_idx = 0
-        self.styles.draw_query(self)
         for c in cont:
-            ctitle = cont_sects[sect_idx](self.base_f)    
+            ctitle = cont_sects[sect_idx](self.base_f)
             ctitle.insert(tk.INSERT, c.title)
             ctitle.config(state="disabled")
             ctitle.grid(row=row_idx, sticky="ewns", rowspan=1)
             self.styles.ctitle(ctitle)
             # bind click to changing font color
             content = cont_sects[sect_idx+1](self.base_f)
+            self.styles.content(content)
             content.insert(tk.INSERT, c.content.rstrip())
             new_height = int(round(float(content.index(tk.END))))
-            content.config(height=new_height, state="disabled")
             content.grid(row=(row_idx+1), sticky="ewns", rowspan=1)
-            self.styles.content(content)
+            content.config(height=new_height, state="disabled")
             row_idx += 2
             sect_idx += 2
 
@@ -103,7 +104,7 @@ class WikiPage(tk.Frame):
             self.styles.qtitle(qtitle_b)
             sections[idx] = qtitle_b
             notes = fm.format_note(i.notes)
-            qnotes_l = tk.Label(self.base_f)
+            qnotes_l = tk.Label(self.base_f, text=notes)
             qnotes_l.grid(row=(ro+1), column=col, sticky="nw")
             self.styles.qnotes(qnotes_l)
             sections[idx+1] = qnotes_l
