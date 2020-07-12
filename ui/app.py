@@ -7,6 +7,7 @@ import utils.globals as g
 import utils.json_database as jdb # Need this to prevent circular import
 from ui.tk_helper import place
 from ui.tk_helper import refresh_globals
+from ui.tk_styles import AppStyles
 import ui.language as en
 from ui.pages.page_wiki import WikiPage
 from ui.pages.page_settings import SettingsPage
@@ -29,14 +30,15 @@ class App():
         self.root.title(s.TITLE)
         self.root.geometry(f"{s.W_HEIGHT}x{s.W_WIDTH}")
         self.root.bind("<Button-1>", self.fuzzy_on_off)
-        self.frame = tk.Frame(self.root, bg=s.FG)
+        self.frame = tk.Frame(self.root)
         place(self.frame, h=1, w=1, x=0.5, y=0.5, a="c")
         self.fuzz_bar_active = False
         self.search_term = ""
-        self.static_bottom_buttons()
-        self.initial_frame()
-        self.searchbar_display()
+        self.create_menu_buttons()
+        self.create_initial_frame()
+        self.create_searchbar()
         db.init_database_info()
+        self.styles = AppStyles(self)
         self.root.mainloop()
         g.DB.close()
 
@@ -46,106 +48,91 @@ class App():
         """
         self.content.destroy()
 
-    def initial_frame(self):
+    def create_initial_frame(self):
         """Initial screen when starting the app"""
-        self.content = tk.Frame(self.frame, bg=s.FG)
-        self.content.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04, anchor="n")
+        self.content = tk.Frame(self.frame)
+        place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.replace(HelpPage(self.frame, "help"))
 
     def fuzzy_frame(self):
-        self.fuzz_bar = tk.Listbox(self.root, selectmode="multiple", height=1,
-                                   font=(15))
-        place(self.fuzz_bar, h="", w=0.6, x=0.2, y=0.04)
-        self.fuzz_bar.bind("<<ListboxSelect>>", self.fuzzy_query)
-        self.fuzz_bar.place_forget()
+        self.fuzz_list = tk.Listbox(self.root)
+        place(self.fuzz_list, h="", w=0.6, x=0.2, y=0.04)
+        self.fuzz_list.bind("<<ListboxSelect>>", self.fuzzy_query)
+        self.fuzz_list.place_forget()
 
     def fuzzy_on_off(self, event):
         if self.fuzz_bar_active:
-            self.fuzz_bar.place_forget()
-            self.fuzz_bar.delete(0, "end")
+            self.fuzz_list.place_forget()
+            self.fuzz_list.delete(0, "end")
 
     def fuzzy_searchbar(self, event):
-        self.search_term = self.searchbar.get()
+        self.search_term = self.search_e.get()
         if self.search_term != "":
-            self.fuzz_bar.delete(0, "end")
+            self.fuzz_list.delete(0, "end")
             suggestions = g.QUERY.fuzzy_page_match(self.search_term,
                                                    s.SEARCHBAR_PG_LIMIT)
-            self.fuzz_bar.config(height=len(suggestions))
+            self.fuzz_list.config(height=len(suggestions))
             for item in suggestions:
-                self.fuzz_bar.insert("end", item.name)  
+                self.fuzz_list.insert("end", item.name)  
             self.fuzz_bar_active = True
-            place(self.fuzz_bar, h="", w=0.6, x=0.2, y=0.04)
+            place(self.fuzz_list, h="", w=0.6, x=0.2, y=0.04)
         else:
-            self.fuzz_bar.place_forget()
-            self.fuzz_bar.delete(0, "end")
-        self.searchbar.focus()
+            self.fuzz_list.place_forget()
+            self.fuzz_list.delete(0, "end")
+        self.search_e.focus()
 
     def fuzzy_query(self, query):
         name = query.widget.get(query.widget.curselection())
         self.replace(WikiPage(self.frame, name))
         self.fuzz_bar_active = False
-        self.fuzz_bar.destroy()
+        self.fuzz_list.destroy()
         self.fuzzy_frame()
         self.frame.focus()
 
-    def searchbar_display(self):
+    def create_searchbar(self):
         """Everything in the top section (search bar and buttons)."""
-        self.frame_search = tk.Frame(self.frame, bg=s.SEARCHBG)
-        place(self.frame_search, h=0.04, w=2, x=0.1, y=0, a="n")
-        self.searchlabel = tk.Label(self.frame_search, text=g.DEFAULT_DB, bg=s.SEARCHBG,
-                                     font=(s.FONT1, 9, "bold"), anchor="center")
-        place(self.searchlabel, h=1, w=0.1, x=0.45, y=0)
-        self.searchbar = tk.Entry(self.frame_search, font=(s.FONT2, 12), bg=s.SEARCHFG,
-                                  fg=s.TEXT2, borderwidth=8, relief="flat")
-        self.searchbar.bind('<KeyRelease>', self.fuzzy_searchbar)
-        self.searchbar.bind("<Return>", (lambda event: [self.replace(
-                            WikiPage(self.frame, self.searchbar.get())),
-                            self.fuzz_bar.place_forget(), self.frame.focus()]))
-        place(self.searchbar, h=1, w=0.3, x=0.55, y=0)
-        searchbutton = tk.Button(self.frame_search, text=en.SEARCH_B1, font=(s.FONT2, 9),
-                                 bg=s.BUTTON_D, fg=s.TEXT1, activebackground=s.BUTTON_A,
-                                 activeforeground=s.TEXT2,
-                                 command=lambda: self.replace(WikiPage(self.frame,
-                                 self.searchbar.get())))
-        place(searchbutton, h=1, w=0.05, x=0.85, y=0)
-        search_by_tag = tk.Button(self.frame_search, text=en.SEARCH_B2, font=(s.FONT2, 9),
-                                 bg=s.BUTTON_D, fg=s.TEXT1, activebackground=s.BUTTON_A,
-                                 activeforeground=s.TEXT2)
-        place(search_by_tag, h=1, w=0.05, x=0.90, y=0)
-        self.fuzzy_frame()
+        self.search_f = tk.Frame(self.frame)
+        place(self.search_f, h=0.04, w=2, x=0.1, y=0, a="n")
+        self.search_l = tk.Label(self.search_f)
+        place(self.search_l, h=1, w=0.1, x=0.45, y=0)
+        self.search_e = tk.Entry(self.search_f)
+        self.search_e.bind('<KeyRelease>', self.fuzzy_searchbar)
+        self.search_e.bind("<Return>", (lambda event: [self.replace(
+                            WikiPage(self.frame, self.search_e.get())),
+                            self.fuzz_list.place_forget(), self.frame.focus()]))
+        place(self.search_e, h=1, w=0.3, x=0.55, y=0)
+        self.search_b = tk.Button(self.search_f, command=lambda: self.replace(
+                                  WikiPage(self.frame, self.search_e.get())))
+        place(self.search_b, h=1, w=0.05, x=0.85, y=0)
+        self.search_tag_b = tk.Button(self.search_f)
+        place(self.search_tag_b, h=1, w=0.05, x=0.90, y=0)
+        self.fuzzy_frame() # Autocomplete popup
 
-    def static_bottom_buttons(self):
+    def create_menu_buttons(self):
         """Everything on the bottom section (the row of buttons)."""
-        self.frame_editor = tk.Frame(self.frame, bg="red")
-        place(self.frame_editor, h=0.03, w=1, x=0.5, y=1, a="s")
-        self.add_wiki = tk.Button(self.frame_editor, text=en.BOTT_B1, font=(s.FONT1, 10,
-                                  "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
-                                  command=lambda: self.replace(AddPage(self.frame, "add")))
-        place(self.add_wiki, h=1, w=0.2, x=0, y=0)
-        self.update_wiki = tk.Button(self.frame_editor, text=en.BOTT_B2, font=(s.FONT1,
-                                     10, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
-                                     command=lambda: self.replace(UpdatePage(self.frame, "update")))
-        place(self.update_wiki, h=1, w=0.2, x=0.2, y=0)
-        self.delete_wiki = tk.Button(self.frame_editor, text=en.BOTT_B3, font=(
-                                     s.FONT1, 10, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
-                                     command=lambda: self.replace(DelPage(
-                                     self.frame, "del")))
-        place(self.delete_wiki, h=1, w=0.2, x=0.4, y=0)
-        self.sett_wiki = tk.Button(self.frame_editor, text=en.BOTT_B4, font=(
-                                   s.FONT1, 10, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
-                                    command=lambda: [self.replace(SettingsPage(self.frame, "sett",
-                                    self.searchlabel)), refresh_globals()])
-        place(self.sett_wiki, h=1, w=0.2, x=0.6, y=0)
-        self.help_wiki = tk.Button(self.frame_editor, text=en.BOTT_B5, font=(s.FONT1,
-                                   10, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
-                                   command=lambda: [self.replace(HelpPage(self.frame,
-                                   "help")), refresh_globals()])
-        place(self.help_wiki, h=1, w=0.2, x=0.8, y=0)
+        self.menu_f = tk.Frame(self.frame)
+        place(self.menu_f, h=0.03, w=1, x=0.5, y=1, a="s")
+        self.menu_add_b = tk.Button(self.menu_f, command=lambda: self.replace(
+                                    AddPage(self.frame, "add")))
+        place(self.menu_add_b, h=1, w=0.2, x=0, y=0)
+        self.menu_update_b = tk.Button(self.menu_f, command=lambda: self.replace(
+                                       UpdatePage(self.frame, "update")))
+        place(self.menu_update_b, h=1, w=0.2, x=0.2, y=0)
+        self.menu_del_b = tk.Button(self.menu_f, command=lambda: self.replace(
+                                    DelPage(self.frame, "del")))
+        place(self.menu_del_b, h=1, w=0.2, x=0.4, y=0)
+        self.menu_sett_b = tk.Button(self.menu_f, command=lambda: [self.replace(
+                                     SettingsPage(self.frame, "sett", self.search_l)),
+                                     refresh_globals()])
+        place(self.menu_sett_b, h=1, w=0.2, x=0.6, y=0)
+        self.menu_help_b = tk.Button(self.menu_f, command=lambda: [self.replace(
+                                     HelpPage(self.frame, "help")), refresh_globals()])
+        place(self.menu_help_b, h=1, w=0.2, x=0.8, y=0)
         # Globals for changing button colors when pressed
         g.MENU_BUTTONS = {
-            "add": self.add_wiki,
-            "update": self.update_wiki,
-            "sett": self.sett_wiki,
-            "help": self.help_wiki,
-            "del": self.delete_wiki
+            "add": self.menu_add_b,
+            "update": self.menu_update_b,
+            "sett": self.menu_sett_b,
+            "help": self.menu_help_b,
+            "del": self.menu_del_b
         }

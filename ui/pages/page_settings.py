@@ -15,6 +15,7 @@ from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 from ui.tk_helper import place
 from ui.tk_helper import change_button_color
+from ui.tk_styles import SettingsPageStyles
 import ui.language as en
 import ui.settings as s
 import utils.globals as g
@@ -34,13 +35,14 @@ class SettingsPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.status = status
         self.filepath = ""
-        self.content = tk.Frame(parent, bg=s.FG, padx=18, pady=18)
+        self.content = tk.Frame(parent)
         place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.layout()
         self.labels()
         self.display()
         self.entries()
         self.buttons()
+        self.styles = SettingsPageStyles(self)
 
     def set_combobox(self):
         """Sets the dropbox menu on the label Load:"""
@@ -50,8 +52,8 @@ class SettingsPage(tk.Frame):
         """Refreshes searchbar's DB status and current loaded on right side 
         info display
         """
-        self.loaded["text"] = g.DEFAULT_DB
-        self.description["text"] = g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB]
+        self.loaded_name_l["text"] = g.DEFAULT_DB
+        self.desc_l["text"] = g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB]
         self.status["text"] = g.DEFAULT_DB
 
     def add_wiki(self, name, notes):
@@ -60,10 +62,10 @@ class SettingsPage(tk.Frame):
             res = name.capitalize()
             jdb.create_profile(res, notes)
             g.WIKI_DB_INFO = jdb.read_json()
-            self.errors["text"] = f"{en.SETT_ADD1} {res}"
+            self.errs_l["text"] = f"{en.SETT_ADD1} {res}"
             g.DEFAULT_DB = res
-            self.loaded["text"] = res
-            self.description["text"] = notes
+            self.loaded_name_l["text"] = res
+            self.desc_l["text"] = notes
             g.WIKI_LIST.append(res)
             self.swap["values"] = g.WIKI_LIST
             self.swap.set(res)
@@ -74,15 +76,15 @@ class SettingsPage(tk.Frame):
             g.MODELCTRL = db.set_ctrl()
             g.QUERY = db.set_query()
         else:
-            self.errors["text"] = en.SETT_ERR1
-        self.name_entry.delete(0, "end")
-        self.notes_entry.delete(0, "end")
+            self.errs_l["text"] = en.SETT_ERR1
+        self.name_e.delete(0, "end")
+        self.notes_e.delete(0, "end")
 
     def delete_wiki(self):
         """Delete Wiki button's function"""
         target = g.DEFAULT_DB
         db.delete_database()
-        self.errors["text"] = f"{en.SETT_ERR2} {target}"
+        self.errs_l["text"] = f"{en.SETT_ERR2} {target}"
         self.set_loaded_display()
         self.swap.config(value=g.WIKI_LIST)
         self.set_combobox()
@@ -96,7 +98,7 @@ class SettingsPage(tk.Frame):
         db.change_database(name)
         db.init_database_info()
         self.set_loaded_display()
-        self.errors["text"] = f"{en.SETT_ERR4} {name}"
+        self.errs_l["text"] = f"{en.SETT_ERR4} {name}"
         self.set_combobox()
         g.MODELCTRL = db.set_ctrl()
         g.QUERY = db.set_query()
@@ -104,7 +106,7 @@ class SettingsPage(tk.Frame):
     def update_wiki_name(self):
         """Edit label: Name button's function"""
         old = f"{g.DB_FILE}"
-        name = self.change_entry.get().title()
+        name = self.edit_e.get().title()
         check = name_check(name)
         if check:
             filename = f"{name}.db"
@@ -114,15 +116,15 @@ class SettingsPage(tk.Frame):
             g.DEFAULT_DB = name
             db.init_database_info()
             self.set_loaded_display()
-            self.errors["text"] = f"{en.SETT_ERR5} {old.replace('.db', '')} to {name}"
+            self.errs_l["text"] = f"{en.SETT_ERR5} {old.replace('.db', '')} to {name}"
             g.MODELCTRL = db.set_ctrl()
             g.QUERY = db.set_query()
         else:
-            self.errors["text"] = en.SETT_ERR1
+            self.errs_l["text"] = en.SETT_ERR1
 
     def update_wiki_desc(self):
         """Label Edit: Button Desc. function"""
-        desc = self.change_entry.get()
+        desc = self.edit_e.get()
         jdb.update_profile_desc(desc)
         self.set_loaded_display()
 
@@ -132,107 +134,89 @@ class SettingsPage(tk.Frame):
         if filename == "":
             pass
         elif ".db" not in os.path.basename(filename):
-            self.import_display.config(fg=s.BUTTON_R)
-            self.import_display["text"] = en.SETT_ERR3
+            self.info_imp_l.config(fg=s.BUTTON_R)
+            self.info_imp_l["text"] = en.SETT_ERR3
             # Test if actual db
         else:
             self.filepath = filename
-            self.import_display.config(fg=s.SEARCHBG)
-            self.import_display["text"] = filename
-            self.import_button.config(bg=s.SEARCHBG)
+            self.info_imp_l.config(fg=s.SEARCHBG)
+            self.info_imp_l["text"] = filename
+            self.import_b.config(bg=s.SEARCHBG)
 
     def labels(self):
-        wiki_name = tk.Label(self.left, text=en.LAB_SETT1, bg=s.FG,
-                             fg=s.TEXT1, font=(s.FONT1, 9))
-        place(wiki_name, h=0.05, w=0.2, x=0, y=0)
-        wiki_notes = tk.Label(self.left, text=en.LAB_SETT2, bg=s.FG,
-                             fg=s.TEXT1, font=(s.FONT1, 9))
-        place(wiki_notes, h=0.05, w=0.2, x=0, y=0.04)
-        swap_name = tk.Label(self.left, text=en.LAB_SETT3, bg=s.FG,
-                             fg=s.TEXT1, font=(s.FONT1, 9))
-        place(swap_name, h=0.05, w=0.2, x=0, y=0.103)
-        wiki_label = tk.Label(self.left, text=en.LAB_SETT4, bg=s.FG,
-                              fg=s.TEXT1, font=(s.FONT1, 9))
-        place(wiki_label, h=0.05, w=0.2, x=0, y=0.155)
-        add_tag_label = tk.Label(self.left, text=en.LAB_SETT5, bg=s.FG,
-                         fg=s.TEXT1, font=(s.FONT1, 9))
-        place(add_tag_label, h=0.05, w=0.2, x=0, y=0.21)
-        import_label = tk.Label(self.left, text=en.LAB_SETT6, bg=s.FG,
-                                fg=s.TEXT1, font=(s.FONT1, 9))
-        place(import_label, h=0.05, w=0.2, x=0, y=0.295)
+        self.name_l = tk.Label(self.left_f)
+        place(self.name_l, h=0.05, w=0.2, x=0, y=0)
+        self.notes_l = tk.Label(self.left_f)
+        place(self.notes_l, h=0.05, w=0.2, x=0, y=0.04)
+        self.load_l = tk.Label(self.left_f)
+        place(self.load_l, h=0.05, w=0.2, x=0, y=0.103)
+        self.edit_l = tk.Label(self.left_f)
+        place(self.edit_l, h=0.05, w=0.2, x=0, y=0.155)
+        self.tag_l = tk.Label(self.left_f)
+        place(self.tag_l, h=0.05, w=0.2, x=0, y=0.21)
+        self.import_l = tk.Label(self.left_f)
+        place(self.import_l, h=0.05, w=0.2, x=0, y=0.295)
 
     def entries(self):
-        self.name_entry = tk.Entry(self.left, bg=s.SEARCHFG)
-        place(self.name_entry, h="", w=0.3, x=0.25, y=0.01)
-        self.notes_entry = tk.Entry(self.left, bg=s.SEARCHFG)
-        place(self.notes_entry, h="", w=0.3, x=0.25, y=0.05)
-        self.swap = ttk.Combobox(self.left, value=g.WIKI_LIST)
+        self.name_e = tk.Entry(self.left_f)
+        place(self.name_e, h="", w=0.3, x=0.25, y=0.01)
+        self.notes_e = tk.Entry(self.left_f)
+        place(self.notes_e, h="", w=0.3, x=0.25, y=0.05)
+        self.swap = ttk.Combobox(self.left_f, value=g.WIKI_LIST)
         self.swap["state"] = "readonly"
         self.set_combobox()
         place(self.swap, h="", w=0.3, x=0.25, y=0.11)
-        self.change_entry = tk.Entry(self.left, bg=s.SEARCHFG)
-        place(self.change_entry, h="", w=0.3, x=0.25, y=0.165)
-        self.add_tag_entry = tk.Entry(self.left, bg=s.SEARCHFG)
-        place(self.add_tag_entry, h="", w=0.3, x=0.25, y=0.22)
+        self.edit_e = tk.Entry(self.left_f)
+        place(self.edit_e, h="", w=0.3, x=0.25, y=0.165)
+        self.tag_e = tk.Entry(self.left_f)
+        place(self.tag_e, h="", w=0.3, x=0.25, y=0.22)
         
     def buttons(self):
-        add_button = tk.Button(self.left, text=en.SETT_B1, bg=s.SEARCHBG, fg=s.TEXT3,
-                               command=lambda: self.add_wiki(self.name_entry.get(),
-                               self.notes_entry.get()))
-        place(add_button, h="", w=0.3, x=0.59, y=0.005)
-        swap_button = tk.Button(self.left, text=en.SETT_B2, bg=s.SEARCHBG,
-                                fg=s.TEXT3, command=lambda: self.load_wiki())
-        place(swap_button, h="", w=0.3, x=0.59, y=0.106)
-        edit_name_button = tk.Button(self.left, text=en.SETT_B3, bg=s.SEARCHBG,
-                                  fg=s.TEXT3, command=lambda: self.update_wiki_name())
-        place(edit_name_button, h="", w=0.18, x=0.59, y=0.16)
-        edit_notes_button = tk.Button(self.left, text=en.SETT_B4, bg=s.SEARCHBG,
-                                      fg=s.TEXT3, command=lambda: self.update_wiki_desc())
-        place(edit_notes_button, h="", w=0.18, x=0.79, y=0.16)
-        import_select = tk.Button(self.left, text=en.SETT_B5, bg=s.SEARCHBG,
-                                  fg=s.TEXT3, command=lambda: self.get_filepath())
-        place(import_select, h="", w=0.3, x=0.25, y=0.3)
-        self.import_button = tk.Button(self.left, text=en.SETT_B6, bg=s.BUTTON_R,
-                                       fg=s.TEXT3)
-        place(self.import_button, h="", w=0.3, x=0.59, y=0.3)
-        self.add_tag_button = tk.Button(self.left, text=en.SETT_B7, bg=s.SEARCHBG,
-                                        fg=s.TEXT3)
-        place(self.add_tag_button, h="", w=0.3, x=0.59, y=0.215)
-        del_button = tk.Button(self.left, text=en.SETT_B8, bg=s.BUTTON_R,
-                               fg=s.TEXT3, command=lambda: self.delete_wiki())
-        place(del_button, h="", w=0.2, x=0.79, y=0.96)
+        self.add_wiki_b = tk.Button(self.left_f, command=lambda: self.add_wiki(
+                                    self.name_e.get(), self.notes_e.get()))
+        place(self.add_wiki_b, h="", w=0.3, x=0.59, y=0.005)
+        self.load_b = tk.Button(self.left_f, command=lambda: self.load_wiki())
+        place(self.load_b, h="", w=0.3, x=0.59, y=0.106)
+        self.edit_name_b = tk.Button(self.left_f, command=lambda:
+                                     self.update_wiki_name())
+        place(self.edit_name_b, h="", w=0.18, x=0.59, y=0.16)
+        self.edit_notes_b = tk.Button(self.left_f, command=lambda:
+                                      self.update_wiki_desc())
+        place(self.edit_notes_b, h="", w=0.18, x=0.79, y=0.16)
+        self.browse_b = tk.Button(self.left_f, command=lambda: self.get_filepath())
+        place(self.browse_b, h="", w=0.3, x=0.25, y=0.3)
+        self.import_b = tk.Button(self.left_f)
+        place(self.import_b, h="", w=0.3, x=0.59, y=0.3)
+        self.tag_b = tk.Button(self.left_f)
+        place(self.tag_b, h="", w=0.3, x=0.59, y=0.215)
+        self.del_b = tk.Button(self.left_f, command=lambda: self.delete_wiki())
+        place(self.del_b, h="", w=0.2, x=0.79, y=0.96)
 
     def display(self):
         """Anything related to information displaying."""
-        self.info = tk.Label(self.right, bg=s.BG2, fg=s.SEARCHBG)
-        place(self.info, h=0.92, w=1, x=0, y=0.08)
-        self.errors = tk.Label(self.right, text="", anchor="w", bg=s.BG2,
-                               fg=s.BUTTON_R, font=(s.FONT2, 12, "bold"), padx=10)
-        place(self.errors, h=0.08, w=1, x=0, y=0)
-        self.import_display = tk.Label(self.left, bg=s.BG2, font=(s.FONT2, 11),
-                                  anchor="w", text="", padx=5)
-        place(self.import_display, h=0.035, w=0.9, x=0.02, y=0.365)
+        self.info_l = tk.Label(self.right_f)
+        place(self.info_l, h=0.92, w=1, x=0, y=0.08)
+        self.errs_l = tk.Label(self.right_f)
+        place(self.errs_l, h=0.08, w=1, x=0, y=0)
+        self.info_imp_l = tk.Label(self.left_f)
+        place(self.info_imp_l, h=0.035, w=0.9, x=0.02, y=0.365)
         self.display_info()
 
     def display_info(self):
-        load_info = tk.Label(self.info, text=en.SETT_DIS1, font=(
-                          s.FONT1, 11), bg=s.BG2, fg=s.SEARCHBG, anchor="w")
-        place(load_info, h=0.05, w=0.9, x=0.052, y=0)
-        self.loaded = tk.Label(self.info, text=g.DEFAULT_DB, font=(s.FONT1, 20, "bold"),
-                          bg=s.BG2, fg=s.SEARCHBG, anchor="w")
-        place(self.loaded, h=0.08, w=0.9, x=0.052, y=0.04)
-        self.description = tk.Label(self.info, text=g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB],
-                                    font=(s.FONT1, 11), anchor="w", bg=s.BG2, fg=s.SEARCHBG)
-        place(self.description, h=0.04, w=0.9, x=0.052, y=0.1)
+        self.loaded_l = tk.Label(self.info_l)
+        place(self.loaded_l, h=0.05, w=0.9, x=0.052, y=0)
+        self.loaded_name_l = tk.Label(self.info_l)
+        place(self.loaded_name_l, h=0.08, w=0.9, x=0.052, y=0.04)
+        self.desc_l = tk.Label(self.info_l)
+        place(self.desc_l, h=0.04, w=0.9, x=0.052, y=0.1)
         page_amt = f"{en.SETT_DIS2} {g.QUERY.page_amt_stats()}"
         tag_amt = f"{en.SETT_DIS3}"
-        self.loaded_stats = tk.Label(self.info, text=page_amt, bg=s.BG2, fg=s.SEARCHBG,
-                                     anchor="w", font=(s.FONT1, 11))
-        place(self.loaded_stats, h=0.04, w=0.4, x=0.052, y=0.17)
+        self.loaded_stats_l = tk.Label(self.info_l, text=page_amt)
+        place(self.loaded_stats_l, h=0.04, w=0.4, x=0.052, y=0.17)
 
     def layout(self):
         """All partitions are relative to self.content"""
-        self.right = tk.Frame(self.content, bg=s.FG)
-        place(self.right, h=1, w=0.5, x=0.5, y=0)
-        self.left = tk.Frame(self.content, bg=s.FG)
-        place(self.left, h=1, w=0.5, x=0, y=0)
+        self.right_f = tk.Frame(self.content, bg=s.FG)
+        place(self.right_f, h=1, w=0.5, x=0.5, y=0)
+        self.left_f = tk.Frame(self.content, bg=s.FG)
+        place(self.left_f, h=1, w=0.5, x=0, y=0)

@@ -6,6 +6,7 @@ from difflib import SequenceMatcher as SM
 import utils.models as db
 import concurrent.futures
 import ui.settings as s
+import utils.formatter as fm
 
 
 class ModelCtrl:
@@ -28,7 +29,7 @@ class ModelCtrl:
         """
         p = self.page.create(
             name = data["name"].title().rstrip(),
-            notes = data["notes"].capitalize().rstrip(),
+            notes = fm.format_note(data["notes"]),
             img_path = "",
             img_title = ""
         )
@@ -45,7 +46,7 @@ class ModelCtrl:
                 page = target,
                 title = v["title"].title().rstrip(),
                 idx = k,
-                content = v["cont"].capitalize().rstrip(),
+                content = fm.format_content(v["cont"]),
                 content_img = "",
                 content_img_title = ""
             )
@@ -55,15 +56,15 @@ class ModelCtrl:
         """Data keys: name, notes"""
         q = None
         if data["name"] != "" and data["notes"] != "":
-            q = (db.Page.update(name=data["name"], notes=data["notes"]).
-                 where(db.Page.name==target_name))
+            q = (db.Page.update(name=data["name"], notes=fm.format_note(
+                 data["notes"])).where(db.Page.name==target_name))
             q.execute()
         elif data["name"] != "":
             q = (db.Page.update(name=data["name"].title().rstrip()).
                  where(db.Page.name==target_name))
             q.execute()
         else:
-            q = (db.Page.update(notes=data["notes"].capitalize().rstrip()).
+            q = (db.Page.update(notes=fm.format_note(data["notes"])).
                  where(db.Page.name==target_name))
             q.execute()
         return q
@@ -79,7 +80,7 @@ class ModelCtrl:
                  db.Content.idx==data["idx"]))
             q.execute()
         else:
-            q = (db.Content.update(content=data["content"].capitalize().rstrip()).
+            q = (db.Content.update(content=fm.format_content(data["content"])).
                  where(db.Content.page==target_page,
                  db.Content.idx==data["idx"]))
             q.execute()

@@ -8,6 +8,7 @@ from utils.models import set_query
 import utils.formatter as fm
 import ui.language as en
 import utils.globals as g
+from ui.tk_styles import WikiPageStyles
 
 
 class WikiPage(tk.Frame):
@@ -16,10 +17,11 @@ class WikiPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         clear_colors()
         g.TARGET = entry.title().rstrip()
-        self.content = tk.Frame(parent, bg=s.FG, padx=10, pady=10)
+        self.content = tk.Frame(parent)
         place(self.content, h=0.93, w=2, x=0.2, y=0.04, a="n")
-        self.base = tk.Frame(self.content, bg=s.FG, padx=25, pady=25)
-        place(self.base, h=1, w=0.5, x=0.402, y=0)
+        self.base_f = tk.Frame(self.content)
+        place(self.base_f, h=1, w=0.5, x=0.402, y=0)
+        self.styles = WikiPageStyles(self)
         self.query_entry()
 
     def query_entry(self):
@@ -42,82 +44,74 @@ class WikiPage(tk.Frame):
         cont_sects = {i: tk.Text for i in range(len(cont)*2)}
         row_amt = ((len(cont)*2) + 2)
         for r in range(row_amt):
-            self.base.grid_rowconfigure(r, weight=0)
-        self.base.grid_columnconfigure(0, weight=1)
-        title = tk.Text(self.base, relief="flat", wrap="word", bg=s.BG2, padx=15,
-                        pady=10, fg=s.SEARCHBG, highlightthickness=0, height=1,
-                        font=(s.FONT2, 25, "bold"))
-        title.insert(tk.INSERT, g.TARGET_PAGE.name)
-        title.config(state="disabled")
-        title.grid(row=0, sticky="ewn", rowspan=1)
-        notes = tk.Text(self.base, relief="flat", bg=s.BG2, padx=25,
-                        pady=10, fg=s.SEARCHBG, highlightthickness=0, height=1,
-                        font=(s.FONT2, 12, "italic"))
-        notes.insert(tk.INSERT, fm.format_note(g.TARGET_PAGE.notes).rstrip())
-        new_height = int(round(float(notes.index(tk.END))))
-        notes.config(height=new_height)
-        notes.config(state="disabled")
-        notes.grid(row=1, sticky="ewns", rowspan=1)
+            self.base_f.grid_rowconfigure(r, weight=0)
+        self.base_f.grid_columnconfigure(0, weight=1)
+        self.title_t = tk.Text(self.base_f)
+        self.title_t.insert(tk.INSERT, g.TARGET_PAGE.name)
+        self.title_t.config(state="disabled")
+        self.title_t.grid(row=0, sticky="ewn", rowspan=1)
+        self.notes_t = tk.Text(self.base_f)
+        self.notes_t.insert(tk.INSERT, fm.format_note(g.TARGET_PAGE.notes).rstrip())
+        new_height = int(round(float(self.notes_t.index(tk.END))))
+        self.notes_t.config(height=new_height)
+        self.notes_t.config(state="disabled")
+        self.notes_t.grid(row=1, sticky="ewns", rowspan=1)
         row_idx = 2
         sect_idx = 0
+        self.styles.draw_query(self)
         for c in cont:
-            ctitle = cont_sects[sect_idx](self.base, relief="flat", wrap="word", bg=s.BG2,
-                             padx=15, pady=10, highlightthickness=0, height=1,
-                             fg=s.SEARCHBG, font=(s.FONT2, 15, "bold"))    
+            ctitle = cont_sects[sect_idx](self.base_f)    
             ctitle.insert(tk.INSERT, c.title)
             ctitle.config(state="disabled")
             ctitle.grid(row=row_idx, sticky="ewns", rowspan=1)
+            self.styles.ctitle(ctitle)
             # bind click to changing font color
-            content = cont_sects[sect_idx+1](self.base, relief="flat", wrap="word", bg=s.BG2,
-                              padx=24, pady=10,  highlightbackground=s.SEARCHBG,
-                              fg=s.SEARCHBG, highlightthickness=1, height=5,
-                              highlightcolor=s.SEARCHFG, font=(s.FONT2, 11))
+            content = cont_sects[sect_idx+1](self.base_f)
             content.insert(tk.INSERT, c.content.rstrip())
             new_height = int(round(float(content.index(tk.END))))
-            content.config(height=new_height)
-            content.config(state="disabled")
+            content.config(height=new_height, state="disabled")
             content.grid(row=(row_idx+1), sticky="ewns", rowspan=1)
+            self.styles.content(content)
             row_idx += 2
             sect_idx += 2
 
     def set_page(self, page_obj):
-        """For suggestion buttons"""
+        """Refreshing base frame when clicking a suggestion item."""
         g.TARGET_PAGE = page_obj
         g.TARGET = page_obj.name
-        self.base.destroy()
-        self.base = tk.Frame(self.content, bg=s.FG, padx=25, pady=25)
-        place(self.base, h=1, w=0.5, x=0.402, y=0)
+        self.base_f.destroy()
+        self.base_f = tk.Frame(self.content)
+        place(self.base_f, h=1, w=0.5, x=0.402, y=0)
+        self.styles.set_page(self.base_f)
         
     def suggestions_page(self, q_list):
         sections = {}
         idx = 0
         col = 0
         ro = 0
-        self.base.grid_columnconfigure(0, weight=1)
+        self.base_f.grid_columnconfigure(0, weight=1)
         for i in q_list:
             if idx == s.SUGGESTION_PG_LIMIT:
                 ro = 0
                 col = 1
-                self.base.grid_columnconfigure(col, weight=1)
-            self.base.grid_rowconfigure(ro, weight=1)
-            self.base.grid_rowconfigure(ro+1, weight=1)
-            qtitle = tk.Button(self.base, text=i.name, font=(s.FONT2, 17, "bold"),
-                               relief="flat", bg=s.BG2, fg=s.SEARCHFG, command=
-                               lambda m=i: [self.set_page(m), self.draw_query()])
-            qtitle.grid(row=ro, column=col, sticky="w")
-            sections[idx] = qtitle
+                self.base_f.grid_columnconfigure(col, weight=1)
+            self.base_f.grid_rowconfigure(ro, weight=1)
+            self.base_f.grid_rowconfigure(ro+1, weight=1)
+            qtitle_b = tk.Button(self.base_f, text=i.name, command=lambda m=i:
+                                 [self.set_page(m), self.draw_query()])
+            qtitle_b.grid(row=ro, column=col, sticky="w")
+            self.styles.qtitle(qtitle_b)
+            sections[idx] = qtitle_b
             notes = fm.format_note(i.notes)
-            qnotes = tk.Label(self.base, text=notes, justify="left", bg=s.FG,
-                              fg=s.SEARCHBG)
-            qnotes.grid(row=(ro+1), column=col, sticky="nw")
-            sections[idx+1] = qnotes
+            qnotes_l = tk.Label(self.base_f)
+            qnotes_l.grid(row=(ro+1), column=col, sticky="nw")
+            self.styles.qnotes(qnotes_l)
+            sections[idx+1] = qnotes_l
             ro += 2
             idx += 2
 
     def not_found(self):
-        self.error = tk.Frame(self.parent, bg=s.FG)
-        self.error.place(relheight=0.93, relwidth=1, relx=0.5, rely=0.04,
-                         anchor="n")
-        message = tk.Label(self.error, text=en.WIKI_ERR1, font=(s.FONT2, 20,
-                           "bold"), bg=s.FG, fg=s.SEARCHFG)
-        place(message, h="", w=0.3, x=0.35, y=0.45)
+        self.err_f = tk.Frame(self.parent)
+        place(self.err_f, h=0.93, w=1, x=0.5, y=0.04, a="n")
+        self.message = tk.Label(self.err_f)
+        place(self.message, h="", w=0.3, x=0.35, y=0.45)

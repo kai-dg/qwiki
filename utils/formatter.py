@@ -10,7 +10,7 @@ def format_title(name:str) -> str:
 
 def format_note(notes:str) -> str:
     res = f"{notes.rstrip()}"
-    if notes != "":
+    if res.split()[0] != "[Notes]" and res != "":
         m = re.search(r"[a-zA-Z]", notes)
         if m:
             notes = notes.replace(notes[m.start()], notes[m.start()].upper(), 1)
