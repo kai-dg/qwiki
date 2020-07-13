@@ -27,11 +27,13 @@ def write_json(data):
 def create_profile(name, notes):
 	data = read_json()
 	data["wikis"][name] = notes
+	g.WIKI_DB_INFO = data
 	write_json(data)
 
 def change_profile(name):
 	data = read_json()
 	data["active"] = name
+	g.DEFAULT_DB = name
 	write_json(data)
 
 def delete_profile(name):

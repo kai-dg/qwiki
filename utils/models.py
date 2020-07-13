@@ -6,6 +6,7 @@ import utils.globals as g
 from utils.controller import ModelCtrl
 from utils.controller import Query
 import os
+from shutil import copyfile
 
 
 class BaseModel(Model):
@@ -61,7 +62,7 @@ def init_database_info():
     g.WIKI_LIST = list(g.WIKI_DB_INFO["wikis"])
     g.WIKI_LIST = [""] if g.WIKI_LIST == [] else g.WIKI_LIST
 
-def change_database(name):
+def change_database(name:str):
     """Changes current database to `name`"""
     g.DB_FILE = f"{name}.db"
     if not g.DB.is_closed():
@@ -77,7 +78,7 @@ def make_tables():
     g.DB.create_tables([Tag.pages.get_through_model()])
     DatabaseInfo.create(set_tags="").save()
 
-def rename_database(filename):
+def rename_database(filename:str):
     if not g.DB.is_closed():
         g.DB.close()
     try:
@@ -107,3 +108,17 @@ def delete_database():
         make_tables()
     jdb.change_profile(name)
     init_database_info()
+
+def import_database(path:str):
+    """Copy from path to current dir
+    Make profile
+    Swap db
+    """
+    base = os.path.dirname(os.path.realpath(__file__))
+    newpath = os.path.basename(path)
+    copy = copyfile(path, newpath)
+    name = newpath.replace(".db", "")
+    notes = ""
+    jdb.create_profile(name, notes)
+    jdb.change_profile(name)
+    change_database(name)

@@ -129,7 +129,9 @@ class SettingsPage(tk.Frame):
         self.set_loaded_display()
 
     def get_filepath(self):
-        """Label Import: Button Browse... function"""
+        """Label Import: Button Browse... function
+        TODO: Check if basefile name already exists in profile
+        """
         filename = askopenfilename()
         if filename == "":
             pass
@@ -142,6 +144,11 @@ class SettingsPage(tk.Frame):
             self.info_imp_l.config(fg=s.SEARCHBG)
             self.info_imp_l["text"] = filename
             self.import_b.config(bg=s.SEARCHBG)
+
+    def import_wiki(self):
+        if self.filepath != "":
+            db.import_database(self.filepath)
+            self.set_loaded_display()
 
     def labels(self):
         self.name_l = tk.Label(self.left_f)
@@ -185,7 +192,7 @@ class SettingsPage(tk.Frame):
         place(self.edit_notes_b, h="", w=0.18, x=0.79, y=0.16)
         self.browse_b = tk.Button(self.left_f, command=lambda: self.get_filepath())
         place(self.browse_b, h="", w=0.3, x=0.25, y=0.3)
-        self.import_b = tk.Button(self.left_f)
+        self.import_b = tk.Button(self.left_f, command=lambda: self.import_wiki())
         place(self.import_b, h="", w=0.3, x=0.59, y=0.3)
         self.tag_b = tk.Button(self.left_f)
         place(self.tag_b, h="", w=0.3, x=0.59, y=0.215)
