@@ -3,6 +3,7 @@
 import tkinter as tk
 from ui.tk_helper import clear_colors
 from ui.tk_helper import place
+from ui.tk_helper import display_page
 import ui.settings as s
 from utils.models import set_query
 import utils.formatter as fm
@@ -13,20 +14,29 @@ from tkinter import ttk
 
 
 class WikiPage(tk.Frame):
-    def __init__(self, parent, entry):
-        self.parent = parent
+    def __init__(self, parent, button=None):
         tk.Frame.__init__(self, parent)
         clear_colors()
-        g.TARGET = entry.title().rstrip()
-        self.content = tk.Frame(parent)
-        place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
-        self.base_f = tk.Frame(self.content)
-        place(self.base_f, h=1, w=1, x=0, y=0)
+        self.canvas = tk.Canvas(None)
+        self.base_f = tk.Frame(self.canvas)
+        self.draw_scrollbar()
         self.styles = WikiPageStyles(self)
+        place(self.canvas, h=0.93, w=1, x=0, y=0.04)
         self.query_entry()
 
+    def draw_scrollbar(self):
+        self.base_f.bind("<Configure>", lambda e: self.canvas.configure(
+                         scrollregion=self.canvas.bbox("all")))
+        self.canvas.create_window((0, 0), window=self.base_f, anchor="nw")
+        self.scroll = tk.Scrollbar(self.canvas, orient="vertical",
+                                   command=self.canvas.yview)
+        self.scroll.pack(side="right", fill="y")
+        self.canvas.configure(yscrollcommand=self.scroll.set)
+        self.canvas.bind_all("<MouseWheel>", lambda event: self.canvas.
+                             yview_scroll(int(-2*(event.delta/120)), "units"))
+
     def query_entry(self):
-        """Implement fuzzy finder here. search -> query -> suggestions -> not_found"""
+        """Matches query with exact match, then a fuzzy search"""
         q = g.QUERY.full_page_match(g.TARGET)
         if len(q) == 1 and g.TARGET != "":
             g.TARGET_PAGE = q[0]
@@ -40,50 +50,19 @@ class WikiPage(tk.Frame):
                 s.TARGET = ""
 
     def draw_query(self):
-        cont = g.QUERY.page_content(g.TARGET_PAGE)
-        g.TARGET_PAGE_CONT = cont
-        cont_sects = {i: tk.Text for i in range(len(cont)*2)}
-        row_amt = ((len(cont)*2) + 2)
-        for r in range(row_amt):
-            self.base_f.grid_rowconfigure(r, weight=0)
-        self.base_f.grid_columnconfigure(0, weight=1)
-        self.title_t = tk.Text(self.base_f)
-        self.title_t.insert(tk.INSERT, g.TARGET_PAGE.name)
-        self.title_t.config(state="disabled")
-        self.title_t.grid(row=0, sticky="ewn", rowspan=1)
-        self.notes_t = tk.Text(self.base_f)
-        self.styles.draw_query(self)
-        self.notes_t.insert(tk.INSERT, fm.format_note(g.TARGET_PAGE.notes).rstrip())
-        new_height = int(round(float(self.notes_t.index(tk.END))))
-        self.notes_t.config(height=new_height)
-        self.notes_t.config(state="disabled")
-        self.notes_t.grid(row=1, sticky="ewns", rowspan=1)
-        row_idx = 2
-        sect_idx = 0
-        for c in cont:
-            ctitle = cont_sects[sect_idx](self.base_f)
-            ctitle.insert(tk.INSERT, c.title)
-            ctitle.config(state="disabled")
-            ctitle.grid(row=row_idx, sticky="ewns", rowspan=1)
-            self.styles.ctitle(ctitle)
-            # bind click to changing font color
-            content = cont_sects[sect_idx+1](self.base_f)
-            self.styles.content(content)
-            content.insert(tk.INSERT, c.content.rstrip())
-            new_height = int(round(float(content.index(tk.END))))
-            content.grid(row=(row_idx+1), sticky="ewns", rowspan=1)
-            content.config(height=new_height, state="disabled")
-            row_idx += 2
-            sect_idx += 2
+        """Creates the query's wiki page"""
+        display_page(self)
+        self.styles.display_page(self)
+        self.styles.disable_text(self)
 
     def set_page(self, page_obj):
         """Refreshing base frame when clicking a suggestion item."""
         g.TARGET_PAGE = page_obj
         g.TARGET = page_obj.name
         self.base_f.destroy()
-        self.base_f = tk.Frame(self.content)
-        place(self.base_f, h=1, w=0.5, x=0.402, y=0)
-        self.styles.set_page(self.base_f)
+        self.base_f = tk.Frame(self.canvas)
+        self.draw_scrollbar()
+        self.styles.set_page(self)
         
     def suggestions_page(self, q_list):
         sections = {}
@@ -92,27 +71,23 @@ class WikiPage(tk.Frame):
         ro = 0
         self.base_f.grid_columnconfigure(0, weight=1)
         for i in q_list:
-            if idx == s.SUGGESTION_PG_LIMIT:
-                ro = 0
-                col = 1
-                self.base_f.grid_columnconfigure(col, weight=1)
-            self.base_f.grid_rowconfigure(ro, weight=1)
-            self.base_f.grid_rowconfigure(ro+1, weight=1)
+            self.base_f.grid_rowconfigure(ro, weight=0)
+            self.base_f.grid_rowconfigure(ro+1, weight=0)
             qtitle_b = tk.Button(self.base_f, text=i.name, command=lambda m=i:
                                  [self.set_page(m), self.draw_query()])
-            qtitle_b.grid(row=ro, column=col, sticky="w")
+            qtitle_b.grid(row=ro, sticky="we", rowspan=1)
             self.styles.qtitle(qtitle_b)
             sections[idx] = qtitle_b
             notes = fm.format_note(i.notes)
             qnotes_l = tk.Label(self.base_f, text=notes)
-            qnotes_l.grid(row=(ro+1), column=col, sticky="nw")
+            qnotes_l.grid(row=(ro+1), sticky="nwe", rowspan=1)
             self.styles.qnotes(qnotes_l)
             sections[idx+1] = qnotes_l
             ro += 2
             idx += 2
 
     def not_found(self):
-        self.err_f = tk.Frame(self.parent)
+        self.err_f = tk.Frame(self.base_f)
         place(self.err_f, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.message = tk.Label(self.err_f)
         place(self.message, h="", w=0.3, x=0.35, y=0.45)

@@ -30,8 +30,8 @@ class AddPage(tk.Frame):
     def __init__(self, parent, button):
         tk.Frame.__init__(self, parent)
         change_button_color(button)
-        self.content = tk.Frame(parent)
-        place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
+        self.base_f = tk.Frame(None)
+        place(self.base_f, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.page_data = deepcopy(g.PAGE_TEMPLATE)
         self.err_amt = 3
         self.errors = {i: tk.Text for i in range(self.err_amt)}
@@ -213,7 +213,7 @@ class AddPage(tk.Frame):
 
     def layout(self):
         """All partitions are relative to self.content"""
-        self.layout_left_f = tk.Frame(self.content)
+        self.layout_left_f = tk.Frame(self.base_f)
         place(self.layout_left_f, h=1, w=0.5, x=0, y=0)
-        self.right = tk.Frame(self.content, bg=s.FG)
+        self.right = tk.Frame(self.base_f, bg=s.FG)
         place(self.right, h=1, w=0.5, x=0.5, y=0)

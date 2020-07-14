@@ -5,8 +5,7 @@ import tkinter as tk
 import ui.settings as s
 import utils.globals as g
 import utils.json_database as jdb # Need this to prevent circular import
-from ui.tk_helper import place
-from ui.tk_helper import refresh_globals
+import ui.tk_helper as tkh
 from ui.tk_styles import AppStyles
 import ui.language as en
 from ui.pages.page_wiki import WikiPage
@@ -31,7 +30,7 @@ class App():
         self.root.geometry(f"{s.W_HEIGHT}x{s.W_WIDTH}")
         self.root.bind("<Button-1>", self.fuzzy_on_off)
         self.frame = tk.Frame(self.root, bg=s.FG)
-        place(self.frame, h=1, w=1, x=0.5, y=0.5, a="c")
+        tkh.place(self.frame, h=1, w=1, x=0, y=0)
         self.fuzz_bar_active = False
         self.search_term = ""
         self.create_menu_buttons()
@@ -39,24 +38,31 @@ class App():
         self.create_searchbar()
         db.init_database_info()
         self.styles = AppStyles(self)
+        tkh.change_button_color("help") # Initial page
         self.root.mainloop()
         g.DB.close()
 
-    def replace(self, cls):
+    def set_query(self):
+        g.TARGET = self.search_e.get().rstrip().title()
+
+    def replace(self, cls, button):
         """Controller for changing self.content frame. Deletes current frame
         to wipe the non init tk objects from that page.
         """
         self.content.destroy()
+        self.content = tk.Frame(self.frame)
+        tkh.place(self.content, h=0.93, w=1, x=0, y=0.04, a="n")
+        cls(self.content, button)
 
     def create_initial_frame(self):
         """Initial screen when starting the app"""
         self.content = tk.Frame(self.frame)
-        place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
-        self.replace(HelpPage(self.frame, "help"))
+        tkh.place(self.content, h=0.93, w=1, x=0, y=0.04, a="n")
+        self.replace(HelpPage, "help")
 
     def fuzzy_frame(self):
         self.fuzz_list = tk.Listbox(self.root)
-        place(self.fuzz_list, h="", w=0.6, x=0.2, y=0.04)
+        tkh.place(self.fuzz_list, h="", w=0.6, x=0.2, y=0.04)
         self.fuzz_list.bind("<<ListboxSelect>>", self.fuzzy_query)
         self.fuzz_list.place_forget()
 
@@ -75,7 +81,7 @@ class App():
             for item in suggestions:
                 self.fuzz_list.insert("end", item.name)  
             self.fuzz_bar_active = True
-            place(self.fuzz_list, h="", w=0.6, x=0.2, y=0.04)
+            tkh.place(self.fuzz_list, h="", w=0.6, x=0.2, y=0.04)
         else:
             self.fuzz_list.place_forget()
             self.fuzz_list.delete(0, "end")
@@ -92,42 +98,41 @@ class App():
     def create_searchbar(self):
         """Everything in the top section (search bar and buttons)."""
         self.search_f = tk.Frame(self.frame)
-        place(self.search_f, h=0.04, w=2, x=0.1, y=0, a="n")
-        self.search_l = tk.Label(self.search_f)
-        place(self.search_l, h=1, w=0.1, x=0.45, y=0)
+        tkh.place(self.search_f, h=0.04, w=2, x=0.1, y=0, a="n")
+        g.DB_STATUS = tk.Label(self.search_f)
+        tkh.place(g.DB_STATUS, h=1, w=0.1, x=0.45, y=0)
         self.search_e = tk.Entry(self.search_f)
         self.search_e.bind('<KeyRelease>', self.fuzzy_searchbar)
-        self.search_e.bind("<Return>", (lambda event: [self.replace(
-                            WikiPage(self.frame, self.search_e.get())),
-                            self.fuzz_list.place_forget(), self.frame.focus()]))
-        place(self.search_e, h=1, w=0.3, x=0.55, y=0)
-        self.search_b = tk.Button(self.search_f, command=lambda: self.replace(
-                                  WikiPage(self.frame, self.search_e.get())))
-        place(self.search_b, h=1, w=0.05, x=0.85, y=0)
+        self.search_e.bind("<Return>", (lambda event: [self.set_query(),
+                            self.replace(WikiPage, ""), self.fuzz_list.
+                            place_forget(), self.frame.focus()]))
+        tkh.place(self.search_e, h=1, w=0.3, x=0.55, y=0)
+        self.search_b = tk.Button(self.search_f, command=lambda: [self.
+                                  set_query(), self.replace(WikiPage, "")])
+        tkh.place(self.search_b, h=1, w=0.05, x=0.85, y=0)
         self.search_tag_b = tk.Button(self.search_f)
-        place(self.search_tag_b, h=1, w=0.05, x=0.90, y=0)
+        tkh.place(self.search_tag_b, h=1, w=0.05, x=0.90, y=0)
         self.fuzzy_frame() # Autocomplete popup
 
     def create_menu_buttons(self):
         """Everything on the bottom section (the row of buttons)."""
         self.menu_f = tk.Frame(self.frame)
-        place(self.menu_f, h=0.03, w=1, x=0.5, y=1, a="s")
+        tkh.place(self.menu_f, h=0.03, w=1, x=0.5, y=1, a="s")
         self.menu_add_b = tk.Button(self.menu_f, command=lambda: self.replace(
-                                    AddPage(self.frame, "add")))
-        place(self.menu_add_b, h=1, w=0.2, x=0, y=0)
+                                    AddPage, "add"))
+        tkh.place(self.menu_add_b, h=1, w=0.2, x=0, y=0)
         self.menu_update_b = tk.Button(self.menu_f, command=lambda: self.replace(
-                                       UpdatePage(self.frame, "update")))
-        place(self.menu_update_b, h=1, w=0.2, x=0.2, y=0)
+                                       UpdatePage, "update"))
+        tkh.place(self.menu_update_b, h=1, w=0.2, x=0.2, y=0)
         self.menu_del_b = tk.Button(self.menu_f, command=lambda: self.replace(
-                                    DelPage(self.frame, "del")))
-        place(self.menu_del_b, h=1, w=0.2, x=0.4, y=0)
+                                    DelPage, "del"))
+        tkh.place(self.menu_del_b, h=1, w=0.2, x=0.4, y=0)
         self.menu_sett_b = tk.Button(self.menu_f, command=lambda: [self.replace(
-                                     SettingsPage(self.frame, "sett", self.search_l)),
-                                     refresh_globals()])
-        place(self.menu_sett_b, h=1, w=0.2, x=0.6, y=0)
+                                     SettingsPage, "sett"), tkh.refresh_globals()])
+        tkh.place(self.menu_sett_b, h=1, w=0.2, x=0.6, y=0)
         self.menu_help_b = tk.Button(self.menu_f, command=lambda: [self.replace(
-                                     HelpPage(self.frame, "help")), refresh_globals()])
-        place(self.menu_help_b, h=1, w=0.2, x=0.8, y=0)
+                                     HelpPage, "help"), tkh.refresh_globals()])
+        tkh.place(self.menu_help_b, h=1, w=0.2, x=0.8, y=0)
         # Globals for changing button colors when pressed
         g.MENU_BUTTONS = {
             "add": self.menu_add_b,

@@ -12,9 +12,9 @@ from ui.tk_styles import DelPageStyles
 class DelPage(tk.Frame):
     def __init__(self, parent, button):
         change_button_color(button)
-        tk.Frame.__init__(self, parent)
-        self.content = tk.Frame(parent)
-        place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
+        self.base_f = tk.Frame.__init__(self, parent)
+        self.content = tk.Frame(self.base_f, bg=s.FG, padx=15, pady=15)
+        place(self.content, h=0.93, w=1, x=0, y=0.04)
         self.target = None
         self.styles = DelPageStyles(self)
         self.check_target()
@@ -27,11 +27,9 @@ class DelPage(tk.Frame):
             self.no_selection()
 
     def selection(self):
-        self.base_f = tk.Frame(self.content)
-        place(self.base_f, h=0.4, w=0.9, x=0.05, y=0.2)
-        self.title_l = tk.Label(self.base_f, text=fm.format_title(
+        self.title_l = tk.Label(self.content, text=fm.format_title(
                                 g.TARGET).rstrip())
-        self.notes_l = tk.Label(self.base_f, text=g.TARGET_PAGE.notes.rstrip())
+        self.notes_l = tk.Label(self.content, text=g.TARGET_PAGE.notes.rstrip())
         place(self.title_l, h=0.2, w=1, x=0, y=0.03)
         place(self.notes_l, h=0.3, w=1, x=0, y=0.23)
         message = f"{en.CONFIRM_1} {self.target}?"
@@ -43,6 +41,7 @@ class DelPage(tk.Frame):
     def no_selection(self):
         self.err_l = tk.Label(self.content)
         place(self.err_l, h=1, w=1, x=0, y=0)
+        self.styles.no_selection(self)
 
     def back(self):
         self.content.destroy()

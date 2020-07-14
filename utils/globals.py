@@ -37,3 +37,5 @@ PAGE_TEMPLATE = {
 TAB = "    "
 MENU_BUTTONS = {} # ui/app.py -> App.bottom_buttons()
 FRAME_TRACKER = [] # back and forward button implementation
+# TKINTER
+DB_STATUS = None

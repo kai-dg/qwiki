@@ -5,13 +5,16 @@ import ui.language as en
 import utils.globals as g
 
 
+def base_f_preset(frame_obj):
+    frame_obj.config(padx=15, pady=15, bg=s.FG)
+
 class AppStyles:
     def __init__(self, app):
         # SEARCHBAR
         app.search_b.config(text=en.SEARCH_B1, font=(s.FONT2, 9), fg=s.TEXT1,
                             bg=s.BUTTON_D, activebackground=s.BUTTON_A,
                             activeforeground=s.TEXT2)
-        app.search_l.config(text=g.DEFAULT_DB, bg=s.SEARCHBG, anchor="center",
+        g.DB_STATUS.config(text=g.DEFAULT_DB, bg=s.SEARCHBG, anchor="center",
                             font=(s.FONT1, 9, "bold"))
         app.search_e.config(font=(s.FONT2, 12), bg=s.SEARCHFG, fg=s.TEXT2,
                             borderwidth=8, relief="flat")
@@ -33,30 +36,40 @@ class AppStyles:
 
 class WikiPageStyles:
     def __init__(self, pg):
-        pg.content.config(bg=s.FG, padx=10, pady=10)
-        pg.base_f.config(bg=s.FG, padx=25, pady=25)
+        base_f_preset(pg.base_f)
+        pg.canvas.config(bd=0, highlightthickness=0, bg=s.FG)
 
-    def draw_query(self, pg):
+    def disable_text(self, pg):
+        pg.title_t.config(state="disabled")
+        pg.notes_t.config(state="disabled")
+        for idx in pg.cont_sects:
+            pg.cont_sects[idx]["tk"].config(state="disabled")
+
+    def display_page(self, pg):
         pg.title_t.config(relief="flat", wrap="word", bg=s.BG2, padx=15,
                           pady=10, fg=s.SEARCHBG, highlightthickness=0,
-                          font=(s.FONT2, 25, "bold"), height=1)
+                          font=(s.FONT2, 25, "bold"), height=1, width=s.TEXT_WIDTH)
         pg.notes_t.config(relief="flat", bg=s.BG2, padx=25, pady=10, height=1,
                           fg=s.SEARCHBG, highlightthickness=0,
-                          font=(s.FONT2, 12, "italic"))
+                          font=(s.FONT2, 12, "italic"), width=s.TEXT_WIDTH)
+        for idx in pg.cont_sects:
+            if pg.cont_sects[idx].get("title", "") != "":
+                pg.cont_sects[idx]["tk"].config(relief="flat", wrap="word",
+                                                bg=s.BG2, padx=15, pady=10,
+                                                highlightthickness=0, height=1,
+                                                fg=s.SEARCHBG, width=s.TEXT_WIDTH,
+                                                font=(s.FONT2, 15, "bold"))
+            if pg.cont_sects[idx].get("content", "") != "":
+                pg.cont_sects[idx]["tk"].config(relief="flat", wrap="word",
+                                                bg=s.BG2, padx=24, pady=10,
+                                                highlightbackground=s.SEARCHBG,
+                                                fg=s.SEARCHBG, highlightthickness=1,
+                                                highlightcolor=s.SEARCHFG,
+                                                font=(s.FONT2, 11), width=s.TEXT_WIDTH)
 
-    def ctitle(self, text_obj):
-        text_obj.config(relief="flat", wrap="word", bg=s.BG2, padx=15, pady=10,
-                        highlightthickness=0, height=1, fg=s.SEARCHBG,
-                        font=(s.FONT2, 15, "bold"))
-
-    def content(self, text_obj):
-        text_obj.config(relief="flat", wrap="word", bg=s.BG2,
-                        padx=24, pady=10,  highlightbackground=s.SEARCHBG,
-                        fg=s.SEARCHBG, highlightthickness=1, height=5,
-                        highlightcolor=s.SEARCHFG, font=(s.FONT2, 11))
-
-    def set_page(self, frame_obj):
-        frame_obj.config(bg=s.FG, padx=25, pady=25)
+    def set_page(self, pg):
+        pg.base_f.config(bg=s.FG, padx=15, pady=0)
+        pg.content.place(relwidth=1.1, relx=0.515)
 
     def qtitle(self, button_obj):
         button_obj.config(font=(s.FONT2, 17, "bold"), relief="flat", bg=s.BG2,
@@ -72,7 +85,7 @@ class WikiPageStyles:
 
 class AddPageStyles:
     def __init__(self, pg):
-        pg.content.config(bg=s.FG, padx=18, pady=18)
+        base_f_preset(pg.base_f)
         pg.layout_left_f.config(bg=s.FG)
         pg.name_l.config(bg=s.FG, fg=s.TEXT1, text=en.LAB_ADD1, font=(
                          s.FONT1, 9))
@@ -119,7 +132,36 @@ class AddPageStyles:
 
 class UpdatePageStyles:
     def __init__(self, pg):
-        pg.content.config(bg=s.FG, padx=10, pady=10)
+        base_f_preset(pg.base_f)
+
+    def editable_text(self, pg):
+        pg.title_t.config(state="normal")
+        pg.notes_t.config(state="normal")
+        ctitle.config(state="normal")
+        pg.content.config(state="normal")
+
+    def display_page(self, pg):
+        base_f_preset(pg.base_f)
+        pg.canvas.config(bd=0, highlightthickness=0, bg=s.FG)
+        pg.title_t.config(relief="flat", height=1, bg=s.BG2, padx=15, pady=10,
+                          fg=s.SEARCHBG, highlightthickness=1, wrap="word",
+                          font=(s.FONT2, 25, "bold"), highlightcolor=s.SEARCHFG,
+                          highlightbackground="black", width=s.TEXT_WIDTH)
+        pg.notes_t.config(relief="flat", bg=s.BG2,highlightthickness=1, pady=10,
+                          padx=25, fg=s.SEARCHBG, highlightcolor=s.SEARCHFG,
+                          font=(s.FONT2, 12, "italic"), height=1,
+                          highlightbackground="black", width=s.TEXT_WIDTH)
+        for idx in pg.cont_sects:
+            if pg.cont_sects[idx].get("title", "") != "":
+                pg.cont_sects[idx]["tk"].config(relief="flat", wrap="word", bg=s.BG2,
+                        padx=15, pady=10, highlightthickness=1, height=1, 
+                        highlightcolor=s.SEARCHFG, fg=s.SEARCHBG, font=(
+                        s.FONT2,15, "bold"), highlightbackground="black", width=s.TEXT_WIDTH)
+            if pg.cont_sects[idx].get("content", "") != "":
+                pg.cont_sects[idx]["tk"].config(relief="flat", wrap="word", bg=s.BG2,
+                        padx=24, pady=10,  highlightbackground="black",
+                        fg=s.SEARCHBG, highlightthickness=1,
+                        highlightcolor=s.SEARCHFG, font=(s.FONT2, 11), width=s.TEXT_WIDTH)
 
     def buttons(self, pg):
         pg.button_f.config(bg=s.FG)
@@ -128,41 +170,20 @@ class UpdatePageStyles:
         pg.cancel_b.config(text=en.UP_B2, font=(s.FONT1, 10, "bold"),
                            bg=s.SEARCHBG, fg=s.TEXT3)
 
-    def draw_selection(self, pg):
-        pg.title_t.config(relief="flat", height=1, bg=s.BG2, padx=15, pady=10,
-                          fg=s.SEARCHBG, highlightthickness=1, wrap="word",
-                          font=(s.FONT2, 25, "bold"), highlightcolor=s.SEARCHFG,
-                          highlightbackground="black")
-        pg.notes_t.config(relief="flat", bg=s.BG2,highlightthickness=1, pady=10,
-                          padx=25, fg=s.SEARCHBG, highlightcolor=s.SEARCHFG,
-                          font=(s.FONT2, 12, "italic"), height=1,
-                          highlightbackground="black")
-
     def selection(self, pg):
-        pg.base_f.config(bg=s.FG, padx=25, pady=25)
+        pg.canvas.config(bd=0, highlightthickness=0, bg=s.FG)
+        pg.base_f.config(bg=s.FG, padx=15, pady=25)
+        pg.content.place(relwidth=1.1, relx=0.515)
 
     def no_selection(self, pg):
         pg.message_l.config(text=en.UP_ERR_1, bg=s.FG, fg=s.SEARCHFG,
                             font=(s.FONT2, 20, "bold"))
 
-    def c_title(self, text_obj):
-        text_obj.config(relief="flat", wrap="word", bg=s.BG2,
-                        padx=15, pady=10, highlightthickness=1, height=1, 
-                        highlightcolor=s.SEARCHFG, fg=s.SEARCHBG, font=(
-                        s.FONT2,15, "bold"), highlightbackground="black")
-
-    def content(self, text_obj):
-        text_obj.config(relief="flat", wrap="word", bg=s.BG2,
-                        padx=24, pady=10,  highlightbackground="black",
-                        fg=s.SEARCHBG, highlightthickness=1, height=5,
-                        highlightcolor=s.SEARCHFG, font=(s.FONT2, 11))
-
 class DelPageStyles:
     def __init__(self, pg):
-        pg.content.config(bg=s.FG, padx=18, pady=18)
+        pass
 
     def selection(self, pg):
-        pg.base_f.config(bg=s.BG2)
         pg.title_l.config(font=(s.FONT1, 20, "bold"), bg=s.BG2, fg=s.SEARCHBG,
                           anchor="w", padx=25)
         pg.notes_l.config(font=(s.FONT1, 12, "bold"), bg=s.BG2, fg=s.SEARCHBG,
@@ -179,7 +200,7 @@ class DelPageStyles:
 
 class SettingsPageStyles:
     def __init__(self, pg):
-        pg.content.config(bg=s.FG, padx=18, pady=18)
+        base_f_preset(pg.base_f)
         pg.name_l.config(text=en.LAB_SETT1, bg=s.FG, fg=s.TEXT1,
                          font=(s.FONT1, 9))
         pg.notes_l.config(text=en.LAB_SETT2, bg=s.FG,

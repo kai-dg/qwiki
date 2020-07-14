@@ -5,6 +5,7 @@ from ui.tk_helper import place
 import ui.settings as s
 from ui.tk_helper import change_button_color
 from ui.tk_helper import clear_colors
+from ui.tk_helper import display_page
 from ui.tk_styles import UpdatePageStyles
 import ui.language as en
 import utils.globals as g
@@ -15,8 +16,8 @@ class UpdatePage(tk.Frame):
     def __init__(self, parent, button):
         change_button_color(button)
         tk.Frame.__init__(self, parent)
-        self.content = tk.Frame(parent)
-        place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
+        self.base_f = tk.Frame(None)
+        place(self.base_f, h=0.93, w=1, x=0, y=0.04)
         self.styles = UpdatePageStyles(self)
         self.check_target()
 
@@ -26,69 +27,40 @@ class UpdatePage(tk.Frame):
         else:
             self.no_selection()
 
+    def draw_scrollbar(self):
+        self.base_f.bind("<Configure>", lambda e: self.canvas.configure(
+                         scrollregion=self.canvas.bbox("all")))
+        self.canvas.create_window((0, 0), window=self.base_f, anchor="nw")
+        self.scroll = tk.Scrollbar(self.canvas, orient="vertical",
+                                   command=self.canvas.yview)
+        self.scroll.pack(side="right", fill="y")
+        self.canvas.configure(yscrollcommand=self.scroll.set)
+        self.canvas.bind_all("<MouseWheel>", lambda event: self.canvas.
+                             yview_scroll(int(-2*(event.delta/120)), "units"))
+
     def selection(self):
-        self.base_f = tk.Frame(self.content)
-        self.styles.selection(self)
-        place(self.base_f, h=1, w=1, x=0, y=0)
-        self.draw_selection()
+        self.base_f.destroy()
+        self.canvas = tk.Canvas(None)
+        place(self.canvas, h=0.93, w=1, x=0, y=0.04)
+        self.base_f = tk.Frame(self.canvas)
+        self.draw_scrollbar()
+        display_page(self)
+        self.styles.display_page(self)
 
     def no_selection(self):
-        self.message_l = tk.Label(self.content)
+        self.message_l = tk.Label(self.base_f)
         place(self.message_l, h=1, w=1, x=0, y=0)
         self.styles.no_selection(self)
 
-    def create_cont_sects(self):
-        data = {}
-        page_idx = 0
-        for i in g.TARGET_PAGE_CONT:
-            data[page_idx] = {"tk": tk.Text, "idx": i.idx, "title": i.title}
-            data[page_idx+1] = {"tk": tk.Text, "idx": i.idx, "content": i.content}
-            page_idx += 2
-        return data
-
-    def draw_selection(self):
-        self.cont_sects = self.create_cont_sects()
-        row_amt = ((len(list(self.cont_sects))) + 3)
-        self.buttons(row_amt)
-        for r in range(row_amt):
-            self.base_f.grid_rowconfigure(r, weight=0)
-        self.base_f.grid_columnconfigure(0, weight=1)
-        self.title_t = tk.Text(self.base_f)
-        self.title_t.insert(tk.INSERT, g.TARGET_PAGE.name)
-        self.title_t.grid(row=0, sticky="ewn", rowspan=1)
-        self.notes_t = tk.Text(self.base_f)
-        self.notes_t.insert(tk.INSERT, g.TARGET_PAGE.notes)
-        new_height = int(round(float(self.notes_t.index(tk.END))))
-        self.notes_t.config(height=new_height)
-        self.notes_t.grid(row=1, sticky="ewns", rowspan=1)
-        self.styles.draw_selection(self)
-        for idx, data in self.cont_sects.items():
-            if data.get("title", "") != "":
-                ctitle = data["tk"](self.base_f)
-                self.styles.c_title(ctitle)
-                ctitle.insert(tk.INSERT, data["title"])
-                ctitle.grid(row=idx+2, sticky="ewns", rowspan=1)
-                data["tk"] = ctitle
-            else:
-            # bind click to changing font color
-                content = data["tk"](self.base_f)
-                self.styles.content(content)
-                content.insert(tk.INSERT, data["content"])
-                new_height = int(round(float(content.index(tk.END))))
-                content.config(height=new_height)
-                content.grid(row=idx+2, sticky="ewns", rowspan=1)
-                data["tk"] = content
-
-
     def buttons(self, row_idx):
-        self.button_f = tk.Frame(self.base_f)
-        self.button_f.grid(row=row_idx, sticky="ewns", rowspan=1)
-        self.button_f.grid_columnconfigure(0, weight=1)
-        self.button_f.grid_columnconfigure(1, weight=1)
+        self.button_f = tk.Frame(self.base_f, bg='red')
+        self.button_f.grid(row=row_idx, sticky="ewns", columnspan=1)
+        self.button_f.grid_columnconfigure(0, weight=0)
+        self.button_f.grid_columnconfigure(1, weight=0)
         self.save_b = tk.Button(self.button_f, command=lambda: self.save())
-        self.save_b.grid(row=0, column=0, sticky="ewns", padx=10, pady=20)
+        self.save_b.grid(row=0, column=0, sticky="ewns", padx=30, pady=20)
         self.cancel_b = tk.Button(self.button_f, command=lambda: self.cancel())
-        self.cancel_b.grid(row=0, column=1, sticky="ewns", padx=10, pady=20)
+        self.cancel_b.grid(row=0, column=1, sticky="ewns", padx=30, pady=20)
         self.styles.buttons(self)
 
     def save(self):

@@ -19,6 +19,7 @@ FONT2 = "Arial"
 # SIZES
 W_HEIGHT = 750
 W_WIDTH = 800
+TEXT_WIDTH = 35 # Wiki Page, Update Page
 # SEARCH SETTINGS
 SEARCHBAR_PG_LIMIT = 5
 SUGGESTION_PG_LIMIT = 8 # Needs to be an even number

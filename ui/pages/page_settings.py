@@ -30,13 +30,12 @@ def name_check(name:str) -> bool:
     return True
 
 class SettingsPage(tk.Frame):
-    def __init__(self, parent, button, status):
+    def __init__(self, parent, button):
         change_button_color(button)
         tk.Frame.__init__(self, parent)
-        self.status = status
+        self.base_f = tk.Frame(None)
+        place(self.base_f, h=0.93, w=1, x=0, y=0.04)
         self.filepath = ""
-        self.content = tk.Frame(parent)
-        place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.layout()
         self.labels()
         self.display()
@@ -54,7 +53,7 @@ class SettingsPage(tk.Frame):
         """
         self.loaded_name_l["text"] = g.DEFAULT_DB
         self.desc_l["text"] = g.WIKI_DB_INFO["wikis"][g.DEFAULT_DB]
-        self.status["text"] = g.DEFAULT_DB
+        g.DB_STATUS["text"] = g.DEFAULT_DB
 
     def add_wiki(self, name, notes):
         """Add Wiki's button function"""
@@ -223,7 +222,7 @@ class SettingsPage(tk.Frame):
 
     def layout(self):
         """All partitions are relative to self.content"""
-        self.right_f = tk.Frame(self.content, bg=s.FG)
+        self.right_f = tk.Frame(self.base_f, bg=s.FG)
         place(self.right_f, h=1, w=0.5, x=0.5, y=0)
-        self.left_f = tk.Frame(self.content, bg=s.FG)
+        self.left_f = tk.Frame(self.base_f, bg=s.FG)
         place(self.left_f, h=1, w=0.5, x=0, y=0)

@@ -10,12 +10,10 @@ import ui.settings as s
 class HelpPage(tk.Frame):
     def __init__(self, parent, button):
         change_button_color(button)
-        tk.Frame.__init__(self, parent)
-        self.content = tk.Frame(parent, bg=s.FG, padx=10, pady=10)
-        place(self.content, h=0.93, w=1, x=0.5, y=0.04, a="n")
+        self.content = tk.Frame.__init__(self, parent)
         welcome = tk.Label(self.content, text=en.WELCOME, font=(s.FONT1, 12, "bold"),
                        bg=s.FG, fg=s.SEARCHFG)
-        welcome.place(relheight=1, relwidth=1, relx=0, rely=0)
+        welcome.place(relheight=0.93, relwidth=1, relx=0, rely=0.04)
         show_button = tk.Button(self.content, text=en.HELP_B1,
                                 font=(s.FONT1, 9, "bold"), bg=s.SEARCHBG, fg=s.TEXT3,
                                 command=lambda: self.show_more())
