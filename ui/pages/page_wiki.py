@@ -61,6 +61,7 @@ class WikiPage(tk.Frame):
         g.TARGET = page_obj.name
         self.base_f.destroy()
         self.base_f = tk.Frame(self.canvas)
+        self.scroll.destroy()
         self.draw_scrollbar()
         self.styles.set_page(self)
         

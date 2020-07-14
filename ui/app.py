@@ -21,8 +21,7 @@ g.QUERY = db.set_query()
 
 class App():
     """Every button on the static interface should use self.replace() to
-    change frames. Anything with static_ means any widget created in those functions
-    will stay on the screen for the entire time.
+    change frames.
     """
     def __init__(self):
         self.root = tk.Tk()
@@ -43,6 +42,7 @@ class App():
         g.DB.close()
 
     def set_query(self):
+        """Format the entry for a query and set it as global"""
         g.TARGET = self.search_e.get().rstrip().title()
 
     def replace(self, cls, button):

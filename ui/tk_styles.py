@@ -68,8 +68,7 @@ class WikiPageStyles:
                                                 font=(s.FONT2, 11), width=s.TEXT_WIDTH)
 
     def set_page(self, pg):
-        pg.base_f.config(bg=s.FG, padx=15, pady=0)
-        pg.content.place(relwidth=1.1, relx=0.515)
+        base_f_preset(pg.base_f)
 
     def qtitle(self, button_obj):
         button_obj.config(font=(s.FONT2, 17, "bold"), relief="flat", bg=s.BG2,
@@ -181,7 +180,7 @@ class UpdatePageStyles:
 
 class DelPageStyles:
     def __init__(self, pg):
-        pass
+        base_f_preset(pg.base_f)
 
     def selection(self, pg):
         pg.title_l.config(font=(s.FONT1, 20, "bold"), bg=s.BG2, fg=s.SEARCHBG,
