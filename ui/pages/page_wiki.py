@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """SEARCH button frame"""
 import tkinter as tk
-from ui.tk_helper import clear_colors
-from ui.tk_helper import place
-from ui.tk_helper import display_page
+import ui.tk_helper as tkh
 import ui.settings as s
 from utils.models import set_query
 import utils.formatter as fm
@@ -16,12 +14,12 @@ from tkinter import ttk
 class WikiPage(tk.Frame):
     def __init__(self, parent, button=None):
         tk.Frame.__init__(self, parent)
-        clear_colors()
+        tkh.clear_colors()
         self.canvas = tk.Canvas(None)
         self.base_f = tk.Frame(self.canvas)
         self.draw_scrollbar()
         self.styles = WikiPageStyles(self)
-        place(self.canvas, h=0.93, w=1, x=0, y=0.04)
+        tkh.place(self.canvas, h=0.93, w=1, x=0, y=0.04)
         self.query_entry()
 
     def draw_scrollbar(self):
@@ -51,7 +49,7 @@ class WikiPage(tk.Frame):
 
     def draw_query(self):
         """Creates the query's wiki page"""
-        display_page(self)
+        tkh.display_page(self)
         self.styles.display_page(self)
         self.styles.disable_text(self)
 
@@ -89,6 +87,6 @@ class WikiPage(tk.Frame):
 
     def not_found(self):
         self.err_f = tk.Frame(self.base_f)
-        place(self.err_f, h=0.93, w=1, x=0.5, y=0.04, a="n")
+        tkh.place(self.err_f, h=0.93, w=1, x=0.5, y=0.04, a="n")
         self.message = tk.Label(self.err_f)
-        place(self.message, h="", w=0.3, x=0.35, y=0.45)
+        tkh.place(self.message, h="", w=0.3, x=0.35, y=0.45)

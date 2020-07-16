@@ -14,9 +14,11 @@ from ui.pages.page_add import AddPage
 from ui.pages.page_update import UpdatePage
 from ui.pages.page_delete import DelPage
 from ui.pages.page_help import HelpPage
+from ui.image_window import ImageWindow
 import utils.models as db
 g.MODELCTRL = db.set_ctrl()
 g.QUERY = db.set_query()
+g.IMAGE_WINDOW = ImageWindow
 
 
 class App():
@@ -25,8 +27,10 @@ class App():
     """
     def __init__(self):
         self.root = tk.Tk()
+        g.ROOT = self.root
         self.root.title(s.TITLE)
         self.root.geometry(f"{s.W_HEIGHT}x{s.W_WIDTH}")
+        self.root.minsize(s.W_HEIGHT, s.W_WIDTH)
         self.root.bind("<Button-1>", self.fuzzy_on_off)
         self.frame = tk.Frame(self.root, bg=s.FG)
         tkh.place(self.frame, h=1, w=1, x=0, y=0)
@@ -110,7 +114,7 @@ class App():
         self.search_b = tk.Button(self.search_f, command=lambda: [self.
                                   set_query(), self.replace(WikiPage, "")])
         tkh.place(self.search_b, h=1, w=0.05, x=0.85, y=0)
-        self.search_tag_b = tk.Button(self.search_f)
+        self.search_tag_b = tk.Button(self.search_f, command=lambda: ImageWindow())
         tkh.place(self.search_tag_b, h=1, w=0.05, x=0.90, y=0)
         self.fuzzy_frame() # Autocomplete popup
 
