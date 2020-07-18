@@ -15,6 +15,7 @@ class WikiPage(tk.Frame):
     def __init__(self, parent, button=None):
         tk.Frame.__init__(self, parent)
         tkh.clear_colors()
+        self.max_rows = 0
         self.canvas = tk.Canvas(None)
         self.base_f = tk.Frame(self.canvas)
         self.draw_scrollbar()
@@ -45,7 +46,7 @@ class WikiPage(tk.Frame):
                 self.suggestions_page(fuzz)
             else:
                 self.not_found()
-                s.TARGET = ""
+                g.TARGET = ""
 
     def draw_query(self):
         """Creates the query's wiki page"""

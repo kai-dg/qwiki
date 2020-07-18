@@ -17,6 +17,7 @@ class UpdatePage(tk.Frame):
         change_button_color(button)
         tk.Frame.__init__(self, parent)
         self.base_f = tk.Frame(None)
+        self.max_rows = 0
         place(self.base_f, h=0.93, w=1, x=0, y=0.04)
         self.styles = UpdatePageStyles(self)
         self.check_target()
@@ -46,15 +47,16 @@ class UpdatePage(tk.Frame):
         self.draw_scrollbar()
         display_page(self)
         self.styles.display_page(self)
+        self.buttons()
 
     def no_selection(self):
         self.message_l = tk.Label(self.base_f)
         place(self.message_l, h=1, w=1, x=0, y=0)
         self.styles.no_selection(self)
 
-    def buttons(self, row_idx):
+    def buttons(self):
         self.button_f = tk.Frame(self.base_f, bg='red')
-        self.button_f.grid(row=row_idx, sticky="ewns", columnspan=1)
+        self.button_f.grid(row=self.max_rows, sticky="ewns", columnspan=1)
         self.button_f.grid_columnconfigure(0, weight=0)
         self.button_f.grid_columnconfigure(1, weight=0)
         self.save_b = tk.Button(self.button_f, command=lambda: self.save())

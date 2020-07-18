@@ -92,8 +92,8 @@ class App():
         self.search_e.focus()
 
     def fuzzy_query(self, query):
-        name = query.widget.get(query.widget.curselection())
-        self.replace(WikiPage(self.frame, name))
+        g.TARGET = query.widget.get(query.widget.curselection())
+        self.replace(WikiPage, "")
         self.fuzz_bar_active = False
         self.fuzz_list.destroy()
         self.fuzzy_frame()

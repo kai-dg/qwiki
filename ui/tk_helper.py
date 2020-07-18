@@ -72,3 +72,4 @@ def display_page(pg):
         pg.cont_sects[sect_idx+1]["tk"] = content
         row_idx += 2
         sect_idx += 2
+    pg.max_rows = row_idx
